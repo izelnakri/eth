@@ -1,0 +1,4 @@
+%{"ex_rlp": {:hex, :ex_rlp, "0.2.1", "bd320900d6316cdfe01d365d4bda22eb2f39b359798daeeffd3bd1ca7ba958ec", [:mix], []},
+  "hexate": {:hex, :hexate, "0.6.1", "1cea42e462c1daa32223127d4752e71016c3d933d492b9bb7fa4709a4a0fd50d", [:mix], []},
+  "keccakf1600": {:git, "https://github.com/jur0/erlang-keccakf1600", "a87d31d32250091262e0da5ee2c2a4535bc50945", [branch: "original-keccak"]},
+  "libsecp256k1": {:git, "https://github.com/mbrix/libsecp256k1.git", "671be513a6c19db47fbeea0ceefbf61421d196cc", []}}
