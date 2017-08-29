@@ -1,5 +1,5 @@
 require IEx
-# elliptic curve cryptography library for Ethereum
+# elliptic curve cryptography library for signing transactions in Ethereum
 defmodule ETH do
   @moduledoc """
   Documentation for Eth.
@@ -15,13 +15,17 @@ defmodule ETH do
 
   """
 
+  def get_private_key do
+    :crypto.strong_rand_bytes(32)
+  end
+
   def private_key_to_address(<< private_key :: binary-size(32) >>) do
     private_key
-    |> private_key_to_public_key()
+    |> get_public_key()
     |> public_key_to_address()
   end
 
-  def private_key_to_public_key(<< private_key :: binary-size(32) >>) do
+  def get_public_key(<< private_key :: binary-size(32) >>) do
     {public_key, ^private_key} = :crypto.generate_key(:ecdh, :secp256k1, private_key)
     public_key
   end
@@ -30,6 +34,24 @@ defmodule ETH do
     << _ :: binary-size(12), address :: binary-size(20) >> = keccak256(key)
     address
   end
+
+  def sign_transaction(
+    source_wallet, value, target_wallet, options \\ [gas_price: 100, gas_limit: 1000, data: "", chain_id: 3]
+  ) do
+    gas_price = options.gas_price |> Hexate.encode
+    gas_limit = options.gas_limit |> Hexate.encode
+    data = data |> Hexate.encode
+
+    Ethereumex.HttpClient.eth_get_transaction_count([first[:eth_address]]) |> elem(1) |> Map.get("result")
+
+    # NOTE: calc nonce
+    %{
+      to: target_wallet[:eth_address], value: Hexate.encode(value), gas_price: gas_price,
+      gas_limit: gas_limit, data: data, chain_id: 3
+    }
+    # get nonce and make a transaction map -> sign_transaction -> send it to client
+  end
+
 
   def sign_transaction(transaction, private_key) do # must have chain_id
     hash = hash_transaction(transaction)
@@ -49,7 +71,8 @@ defmodule ETH do
   def adjust_v_for_chain_id(transaction) do
     if transaction.chain_id > 0 do
       current_v_bytes = Base.decode16!(transaction.v, case: :lower) |> :binary.decode_unsigned
-      transaction |> Map.merge(%{v: encode16(<< current_v_bytes + (transaction.chain_id * 2 + 8) >>) })
+      target_v_bytes = current_v_bytes + (transaction.chain_id * 2 + 8)
+      transaction |> Map.merge(%{v: encode16(<< target_v_bytes >>) })
     else
       transaction
     end
@@ -62,6 +85,7 @@ defmodule ETH do
 
   # must have [nonce, gasPrice, gasLimit, to, value, data] # and chainId inside the transaction?
   def hash_transaction(transaction) do
+    # NOTE: if transaction is decoded no need to encode
     # EIP155 spec:
     # when computing the hash of a transaction for purposes of signing or recovering,
     # instead of hashing only the first six elements (ie. nonce, gasprice, startgas, to, value, data),

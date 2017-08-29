@@ -37,7 +37,7 @@ defmodule ETHTest do
     assert ETH.secp256k1_signature(hash, private_key)[:signature] |> Base.encode16(case: :lower) == target_signature
   end
 
-  test "hash_transaction\2 works" do
+  test "hash_transaction/2 works" do
     result = ETH.hash_transaction(@first_example_transaction) |> Base.encode16(case: :lower)
     target_digest = "df2a7cb6d05278504959987a144c116dbd11cbdc50d6482c5bae84a7f41e2113"
     assert result == target_digest
