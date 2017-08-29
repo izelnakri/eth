@@ -8,7 +8,8 @@ defmodule Eth.Mixfile do
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
-      package: package
+      package: package(),
+      description: description()
     ]
   end
 
