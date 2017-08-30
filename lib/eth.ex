@@ -15,34 +15,14 @@ defmodule ETH do
 
   """
 
-  def get_private_key do
-    :crypto.strong_rand_bytes(32)
-  end
-
-  def private_key_to_address(<< private_key :: binary-size(32) >>) do
-    private_key
-    |> get_public_key()
-    |> public_key_to_address()
-  end
-
-  def get_public_key(<< private_key :: binary-size(32) >>) do
-    {public_key, ^private_key} = :crypto.generate_key(:ecdh, :secp256k1, private_key)
-    public_key
-  end
-
-  def public_key_to_address(<< 4 :: size(8), key :: binary-size(64) >>) do
-    << _ :: binary-size(12), address :: binary-size(20) >> = keccak256(key)
-    address
-  end
-
   def sign_transaction(
     source_wallet, value, target_wallet, options \\ [gas_price: 100, gas_limit: 1000, data: "", chain_id: 3]
   ) do
     gas_price = options.gas_price |> Hexate.encode
     gas_limit = options.gas_limit |> Hexate.encode
-    data = data |> Hexate.encode
+    data = options.data |> Hexate.encode
 
-    Ethereumex.HttpClient.eth_get_transaction_count([first[:eth_address]]) |> elem(1) |> Map.get("result")
+    Ethereumex.HttpClient.eth_get_transaction_count([source_wallet[:eth_address]]) |> elem(1) |> Map.get("result")
 
     # NOTE: calc nonce
     %{
@@ -111,6 +91,24 @@ defmodule ETH do
     r = default_is_empty(transaction, :r)
     s = default_is_empty(transaction, :s)
     [nonce, gas_price, gas_limit, to, value, data, v, r, s]
+  end
+
+  def convert(number, magnitute \\ :ether) do
+    denomination = [
+      wei:     1,
+      kwei:    1000,
+      mwei:    1000000,
+      gwei:    1000000000,
+      shannon: 1000000000,
+      nano:    1000000000,
+      szabo:   1000000000000,
+      micro:   1000000000000,
+      finney:  1000000000000000,
+      milli:   1000000000000000,
+      ether:   1000000000000000000,
+    ] |> List.keyfind(magnitute, 0) |> elem(1)
+
+    number / denomination
   end
 
   def keccak256(data), do: :keccakf1600.hash(:sha3_256, data)

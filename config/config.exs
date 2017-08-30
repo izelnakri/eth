@@ -8,6 +8,11 @@ use Mix.Config
 # if you want to provide default values for your application for
 # 3rd-party users, it should be done in your "mix.exs" file.
 
+config :ethereumex,
+  scheme: "http",
+  host: "localhost",
+  port: 8545
+
 # You can configure your application as:
 #
 #     config :eth, key: :value
