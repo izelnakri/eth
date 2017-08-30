@@ -14,6 +14,11 @@ defmodule ETH.UtilsTest do
     assert public_key |> byte_size == 65
     assert public_key == ETH.Utils.get_public_key(private_key)
     assert public_key != ETH.Utils.get_public_key(another_private_key)
+
+    1..1000 |> Enum.each(fn(x) ->
+      private_key = :crypto.strong_rand_bytes(32)
+      ETH.Utils.get_public_key(private_key)
+    end)
   end
 
   test "get_public_key/1 works for encoded private keys" do
