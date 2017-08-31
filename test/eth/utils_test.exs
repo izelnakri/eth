@@ -15,7 +15,7 @@ defmodule ETH.UtilsTest do
     assert public_key == ETH.Utils.get_public_key(private_key)
     assert public_key != ETH.Utils.get_public_key(another_private_key)
 
-    1..1000 |> Enum.each(fn(x) ->
+    1..1000 |> Enum.each(fn(_) ->
       private_key = :crypto.strong_rand_bytes(32)
       ETH.Utils.get_public_key(private_key)
     end)
