@@ -1,4 +1,5 @@
 require IEx
+# TODO :probably I have to do hexate encodings
 defmodule ETH.Transaction do
   import ETH.Utils
 
@@ -6,10 +7,12 @@ defmodule ETH.Transaction do
 
   def set(params = [from: from, to: to, value: value]) do
     gas_price = Keyword.get(params, :gas_price, ETH.Query.gas_price())
-    gas_limit = Keyword.get(params, :gas_limit, ETH.Query.gas_limit())
     data = Keyword.get(params, :data, "")
     nonce = Keyword.get(params, :nonce, ETH.Query.transaction_count(from))
     chain_id = Keyword.get(params, :chain_id, 3)
+    gas_limit = Keyword.get(params, :gas_limit, ETH.Query.estimate_gas(%{
+      to: to, value: value, data: data, nonce: nonce, chain_id: chain_id
+    }))
 
     %{
       from: from, to: to, value: value, gas_price: gas_price, gas_limit: gas_limit,
@@ -29,58 +32,21 @@ defmodule ETH.Transaction do
     sign_transaction(transaction, decoded_private_key)
   end
 
-  def send(signature) do
-    # NOTE: make it strict
+  def send(signature) do # TODO: make it strict
     Ethereumex.HttpClient.eth_send_raw_transaction([signature])
   end
 
-  # def send(transaction \\ %{data: "", chain_id: 3, gas_price: 1})
-  # NOTE: send_transaction\1
-  # if there is a gas price dont use it
-  # def send(transaction = %{from: from, to: to, value: value}) do
-  #   transaction_params = case Map.get(transaction, :data) do
-  #     nil -> transaction |> Map.merge(%{data: ""})
-  #     _ -> transaction
-  #   end
-  #
-  #   gas_limit = Map.get(transaction, :gas_limit, Query.estimate_gas(transaction_params)) # NOTE: maybe do it slightly more
-  #
-  #   IEx.pry
-  #
-  #   transaction_options = [
-  #     data: Map.get(transaction, :data, ""), chain_id: Map.get(transaction, :chain_id, 3),
-  #     gas_price: Map.get(transaction, :gas_price, 1), gas_limit: gas_limit
-  #   ]
-  #   # NOTE: get nonce
-  #
-  #   IEx.pry
-  #   signature = ETH.sign_transaction(from, value, to, transaction_options)
-  #   IEx.pry
-  #   Ethereumex.HttpClient.eth_send_raw_transaction([signature])
-  # end
-
-  # set -> sign -> sign_transaction
-
-  # def sign_transaction(
-  #   source_eth_address, value, target_eth_address,
-  #   options \\ [gas_price: 100, gas_limit: 1000, data: "", chain_id: 3]
-  # ) do
-  #   gas_price = options[:gas_price] |> Hexate.encode
-  #   gas_limit = options[:gas_limit] |> Hexate.encode
-  #   data = options[:data] |> Hexate.encode
-  #
-  #   nonce = case options[:nonce] do
-  #     nil -> ETH.Query.get_transaction_count(source_eth_address)
-  #     _ -> options[:nonce]
-  #   end
-  #
-  #   # NOTE: calc nonce
-  #   %{
-  #     to: target_eth_address, value: Hexate.encode(value), gas_price: gas_price,
-  #     gas_limit: gas_limit, data: data, chain_id: 3
-  #   }
-  #   # get nonce and make a transaction map -> sign_transaction -> send it to client
-  # end
+  def send_transaction(params = [from: from, to: to, value: value], private_key) do
+    set(params)
+    |> sign(private_key)
+    |> send
+  end
+  def send_transaction(params = %{from: from, to: to, value: value}, private_key) do
+    Map.to_list(params)
+    |> set
+    |> sign(private_key)
+    |> send
+  end
 
   def hash_transaction(transaction = %{
     to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
@@ -98,31 +64,10 @@ defmodule ETH.Transaction do
     |> hash
   end
 
-  def hash(transaction_list) do
+  def hash(transaction_list = [_nonce, _gas_price, _gas_limit, _to, _value, _data, _v, _r, _s]) do
     transaction_list
     |> ExRLP.encode
     |> keccak256
-  end
-
-  defp adjust_v_for_chain_id(transaction) do
-    if transaction.chain_id > 0 do
-      current_v_bytes = Base.decode16!(transaction.v, case: :lower) |> :binary.decode_unsigned
-      target_v_bytes = current_v_bytes + (transaction.chain_id * 2 + 8)
-      transaction |> Map.merge(%{v: encode16(<< target_v_bytes >>) })
-    else
-      transaction
-    end
-  end
-
-  defp to_list(transaction) do
-    %{
-      nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data
-    } = transaction
-
-    v = Map.get(transaction, :v, Base.encode16(<<28>>, case: :lower))
-    r = Map.get(transaction, :r, "")
-    s = Map.get(transaction, :s, "")
-    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
   end
 
   defp sign_transaction(transaction = %{
@@ -140,5 +85,27 @@ defmodule ETH.Transaction do
     |> to_list
     |> Enum.map(fn(x) -> Base.decode16!(x, case: :lower) end)
     |> ExRLP.encode
+  end
+
+  defp adjust_v_for_chain_id(transaction = %{
+    to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
+    nonce: _nonce, chain_id: chain_id, v: v, r: r, s: s
+  }) do
+    if chain_id > 0 do
+      current_v_bytes = Base.decode16!(v, case: :lower) |> :binary.decode_unsigned
+      target_v_bytes = current_v_bytes + (chain_id * 2 + 8)
+      transaction |> Map.merge(%{v: encode16(<< target_v_bytes >>)})
+    else
+      transaction
+    end
+  end
+
+  defp to_list(transaction = %{
+    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data
+  }) do
+    v = Map.get(transaction, :v, Base.encode16(<<28>>, case: :lower))
+    r = Map.get(transaction, :r, "")
+    s = Map.get(transaction, :s, "")
+    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
   end
 end
