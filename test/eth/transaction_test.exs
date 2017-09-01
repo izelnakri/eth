@@ -47,8 +47,7 @@ defmodule ETH.TransactionTest do
 
   test "sign/2 works" do
     signature = ETH.Transaction.sign(@first_example_transaction, @first_example_wallet.private_key)
-      |> Base.encode16(case: :lower)
-
+    |> Base.encode16(case: :lower)
     assert signature == "f889808609184e72a00082271094000000000000000000000000000000000000000080a47f746573743200000000000000000000000000000000000000000000000000000060005729a0f2d54d3399c9bcd3ac3482a5ffaeddfe68e9a805375f626b4f2f8cf530c2d95aa05b3bb54e6e8db52083a9b674e578c843a87c292f0383ddba168573808d36dc8e"
   end
 end

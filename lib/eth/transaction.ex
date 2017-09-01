@@ -8,16 +8,19 @@ defmodule ETH.Transaction do
   def set(params = [from: from, to: to, value: value]) do
     gas_price = Keyword.get(params, :gas_price, ETH.Query.gas_price())
     data = Keyword.get(params, :data, "")
-    nonce = Keyword.get(params, :nonce, ETH.Query.transaction_count(from))
+    nonce = Keyword.get(params, :nonce, ETH.Query.get_transaction_count(from))
     chain_id = Keyword.get(params, :chain_id, 3)
     gas_limit = Keyword.get(params, :gas_limit, ETH.Query.estimate_gas(%{
       to: to, value: value, data: data, nonce: nonce, chain_id: chain_id
     }))
 
-    %{
-      from: from, to: to, value: value, gas_price: gas_price, gas_limit: gas_limit,
-      data: data, nonce: nonce, chain_id: chain_id
-    }
+    [
+      to: to, value: to_hex(value), data: to_hex(data), gas_price: to_hex(gas_price),
+      gas_limit: to_hex(gas_limit), nonce: nonce
+    ] |> Enum.map(fn(x) ->
+      {key, value} = x
+      {key, Base.encode16(value, case: :lower)}
+    end) |> Enum.into(%{chain_id: chain_id})
   end
 
   def sign(transaction = %{
@@ -32,33 +35,31 @@ defmodule ETH.Transaction do
     sign_transaction(transaction, decoded_private_key)
   end
 
-  def send(signature) do # TODO: make it strict
-    Ethereumex.HttpClient.eth_send_raw_transaction([signature])
-  end
+  def send(signature), do: Ethereumex.HttpClient.eth_send_raw_transaction([signature])
 
-  def send_transaction(params = [from: from, to: to, value: value], private_key) do
+  def send_transaction(params = [from: _from, to: _to, value: _value], private_key) do
     set(params)
     |> sign(private_key)
     |> send
   end
-  def send_transaction(params = %{from: from, to: to, value: value}, private_key) do
+  def send_transaction(params = %{from: _from, to: _to, value: _value}, private_key) do
     Map.to_list(params)
     |> set
     |> sign(private_key)
     |> send
   end
 
+  # NOTE: if transaction is decoded no need to encode
+
   def hash_transaction(transaction = %{
     to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
-    nonce: _nonce, chain_id: _chain_id
-  }) do
-    # NOTE: if transaction is decoded no need to encode
-    # EIP155 spec:
+    nonce: _nonce, chain_id: chain_id
+  }) do # EIP155 spec:
     # when computing the hash of a transaction for purposes of signing or recovering,
     # instead of hashing only the first six elements (ie. nonce, gasprice, startgas, to, value, data),
     # hash nine elements, with v replaced by CHAIN_ID, r = 0 and s = 0
     transaction
-    |> Map.merge(%{v: encode16(<<transaction.chain_id>>), r: <<>>, s: <<>>})
+    |> Map.merge(%{v: encode16(<<chain_id>>), r: <<>>, s: <<>>})
     |> to_list
     |> Enum.map(fn(x) -> Base.decode16!(x, case: :lower) end)
     |> hash
