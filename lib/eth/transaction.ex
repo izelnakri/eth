@@ -31,7 +31,7 @@ defmodule ETH.Transaction do
     to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
     nonce: _nonce, chain_id: _chain_id
   }, << encoded_private_key :: binary-size(64) >>) do
-    decoded_private_key = Base.decode16!(encoded_private_key, case: :lower)
+    decoded_private_key = Base.decode16!(encoded_private_key, case: :mixed)
     sign_transaction(transaction, decoded_private_key)
   end
 
@@ -61,7 +61,7 @@ defmodule ETH.Transaction do
     transaction
     |> Map.merge(%{v: encode16(<<chain_id>>), r: <<>>, s: <<>>})
     |> to_list
-    |> Enum.map(fn(x) -> Base.decode16!(x, case: :lower) end)
+    |> Enum.map(fn(x) -> Base.decode16!(x, case: :mixed) end)
     |> hash
   end
 
@@ -84,7 +84,7 @@ defmodule ETH.Transaction do
     |> Map.merge(%{r: encode16(r), s: encode16(s), v: encode16(<<recovery + 27>>)})
     |> adjust_v_for_chain_id
     |> to_list
-    |> Enum.map(fn(x) -> Base.decode16!(x, case: :lower) end)
+    |> Enum.map(fn(x) -> Base.decode16!(x, case: :mixed) end)
     |> ExRLP.encode
   end
 
@@ -93,7 +93,7 @@ defmodule ETH.Transaction do
     nonce: _nonce, chain_id: chain_id, v: v, r: r, s: s
   }) do
     if chain_id > 0 do
-      current_v_bytes = Base.decode16!(v, case: :lower) |> :binary.decode_unsigned
+      current_v_bytes = Base.decode16!(v, case: :mixed) |> :binary.decode_unsigned
       target_v_bytes = current_v_bytes + (chain_id * 2 + 8)
       transaction |> Map.merge(%{v: encode16(<< target_v_bytes >>)})
     else
@@ -109,4 +109,6 @@ defmodule ETH.Transaction do
     s = Map.get(transaction, :s, "")
     [nonce, gas_price, gas_limit, to, value, data, v, r, s]
   end
+
+  def to_hex(value), do: Hexate.encode(value)
 end
