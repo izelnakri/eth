@@ -20,7 +20,7 @@ defmodule ETH.Transaction do
     ] |> Enum.map(fn(x) ->
       {key, value} = x
       {key, Base.encode16(value, case: :lower)}
-    end) |> Enum.into(%{chain_id: chain_id})
+    end) |> Enum.into(%{chain_id: chain_id}) # NOTE: this is probably wrong
   end
 
   def sign(transaction = %{
@@ -54,10 +54,7 @@ defmodule ETH.Transaction do
   def hash_transaction(transaction = %{
     to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
     nonce: _nonce, chain_id: chain_id
-  }) do # EIP155 spec:
-    # when computing the hash of a transaction for purposes of signing or recovering,
-    # instead of hashing only the first six elements (ie. nonce, gasprice, startgas, to, value, data),
-    # hash nine elements, with v replaced by CHAIN_ID, r = 0 and s = 0
+  }) do
     transaction
     |> Map.merge(%{v: encode16(<<chain_id>>), r: <<>>, s: <<>>})
     |> to_list
@@ -65,10 +62,46 @@ defmodule ETH.Transaction do
     |> hash
   end
 
-  def hash(transaction_list = [_nonce, _gas_price, _gas_limit, _to, _value, _data, _v, _r, _s]) do
-    transaction_list
+  def hash(transaction_list, include_signature \\ true) do
+    target_list = case include_signature do
+      true -> transaction_list
+      false ->
+        # EIP155 spec:
+        # when computing the hash of a transaction for purposes of signing or recovering,
+        # instead of hashing only the first six elements (ie. nonce, gasprice, startgas, to, value, data),
+        # hash nine elements, with v replaced by CHAIN_ID, r = 0 and s = 0
+        list = transaction_list |> Enum.take(6)
+        v = transaction_list |> Enum.at(6)
+        if get_chain_id(v) > 0, do: list ++ ["0x#{chain_id}", "0x", "0x"], else: list # NOTE: this part is dangerous: in JS we change state(v: chainId, r: 0, s: 0)
+    end
+    IO.puts("target_list is:")
+    IO.inspect(target_list)
+
+    target_list
+    |> Enum.map(fn(value) -> # NOTE: maybe move this should be moved somewhere else (probably .set() sets these or transaction list)
+      cond do
+        is_number(value) ->
+          IO.puts("value is")
+          IO.puts(value)
+          string_value = to_string(value)
+          result = add_0_for_uneven_encoding(string_value)
+          IO.puts("result is:")
+          IO.puts(result)
+          result
+        String.slice(value, 0..1) == "0x" ->
+          "0x" <> stripped_value = value
+          encoded_value = add_0_for_uneven_encoding(stripped_value)
+          Base.decode16!(encoded_value, case: :mixed)
+        true -> value
+      end
+      # NOTE: else if (v === null || v === undefined) { v = Buffer.allocUnsafe(0) }
+    end)
     |> ExRLP.encode
     |> keccak256
+  end
+
+  def verify_signature(transaction) do
+
   end
 
   defp sign_transaction(transaction = %{
@@ -88,7 +121,7 @@ defmodule ETH.Transaction do
     |> ExRLP.encode
   end
 
-  defp adjust_v_for_chain_id(transaction = %{
+  defp adjust_v_for_chain_id(transaction = %{ # NOTE: this is probably not correct
     to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
     nonce: _nonce, chain_id: chain_id, v: v, r: r, s: s
   }) do
@@ -107,8 +140,23 @@ defmodule ETH.Transaction do
     v = Map.get(transaction, :v, Base.encode16(<<28>>, case: :lower))
     r = Map.get(transaction, :r, "")
     s = Map.get(transaction, :s, "")
-    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
+
+    [nonce, gas_price, gas_limit, to, value, data, v, r, s] # NOTE: maybe this should turn things toBuffer
   end
 
-  def to_hex(value), do: Hexate.encode(value)
+  defp add_0_for_uneven_encoding(value) do
+    case rem(String.length(value), 2) == 1 do
+      true -> "0" <> value
+      false -> value
+    end
+  end
+
+  defp get_chain_id(v) do
+    "0x" <> v_string = v
+    {sig_v, _} = Integer.parse(v_string, 16)
+    chain_id = Float.floor((sig_v - 35) / 2)
+    if chain_id < 0, do: 0, else: Kernel.trunc(chain_id)
+  end
+
+  def to_hex(value), do: HexPrefix.encode(value)
 end
