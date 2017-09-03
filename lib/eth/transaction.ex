@@ -1,5 +1,5 @@
 require IEx
-# TODO :probably I have to do hexate encodings
+
 defmodule ETH.Transaction do
   import ETH.Utils
 
@@ -15,12 +15,13 @@ defmodule ETH.Transaction do
     }))
 
     [
-      to: to, value: to_hex(value), data: to_hex(data), gas_price: to_hex(gas_price),
-      gas_limit: to_hex(gas_limit), nonce: nonce
-    ] |> Enum.map(fn(x) ->
-      {key, value} = x
-      {key, Base.encode16(value, case: :lower)}
-    end) |> Enum.into(%{chain_id: chain_id}) # NOTE: this is probably wrong
+      to: to, value: value, data: data, gas_price: gas_price, gas_limit: gas_limit, nonce: nonce
+    ]
+    # |> Enum.map(fn(x) ->
+    #   {key, value} = x
+    #   {key, Base.encode16(value, case: :lower)}
+    # end)
+    |> Enum.into(%{chain_id: chain_id}) # NOTE: this is probably wrong
   end
 
   def sign(transaction = %{
@@ -72,7 +73,8 @@ defmodule ETH.Transaction do
         # hash nine elements, with v replaced by CHAIN_ID, r = 0 and s = 0
         list = transaction_list |> Enum.take(6)
         v = transaction_list |> Enum.at(6)
-        if get_chain_id(v) > 0, do: list ++ ["0x#{chain_id}", "0x", "0x"], else: list # NOTE: this part is dangerous: in JS we change state(v: chainId, r: 0, s: 0)
+        chain_id = get_chain_id(v)
+        if chain_id > 0, do: list ++ ["0x#{chain_id}", "0x", "0x"], else: list # NOTE: this part is dangerous: in JS we change state(v: chainId, r: 0, s: 0)
     end
     IO.puts("target_list is:")
     IO.inspect(target_list)
@@ -144,6 +146,32 @@ defmodule ETH.Transaction do
     [nonce, gas_price, gas_limit, to, value, data, v, r, s] # NOTE: maybe this should turn things toBuffer
   end
 
+  def decode_transaction_list(transaction_list=[]) do
+    # encoded_list = transaction_list # NOTE: remove this line
+    # encoded_list = transaction_list |> Enum.map(fn(value) -> buffer_decoder(value) end)
+
+    params = %{
+      nonce: Enum.at(encoded_list, 0),
+      gas_price: Enum.at(encoded_list, 1),
+      gas_limit: Enum.at(encoded_list, 2),
+      to: Enum.at(encoded_list, 3),
+      value: Enum.at(encoded_list, 4),
+      data: Enum.at(encoded_list, 5)
+    }
+
+    if transaction_list |> length > 6 do
+      params |> Map.merge(%{
+        v: Enum.at(encoded_list, 6),
+        r: Enum.at(encoded_list, 7),
+        s: Enum.at(encoded_list, 8)
+      })
+    else
+      params
+    end
+  end
+
+  def to_hex(value), do: HexPrefix.encode(value)
+
   defp add_0_for_uneven_encoding(value) do
     case rem(String.length(value), 2) == 1 do
       true -> "0" <> value
@@ -158,5 +186,32 @@ defmodule ETH.Transaction do
     if chain_id < 0, do: 0, else: Kernel.trunc(chain_id)
   end
 
-  def to_hex(value), do: HexPrefix.encode(value)
+  defp buffer_to_int(data) do
+    "0x" <> v_string = v
+    {number, _} = Integer.parse(v_string, 16)
+    number
+  end
+
+  defp buffer_encode(data) do
+    "0x" <> Base.encode16(data, case: :mixed)
+  end
+
+  defp to_buffer(nil), do: ""
+  defp to_buffer(data) when is_number(data), do: Hexate.encode(data)
+  defp to_buffer("0x" <> data) do
+    padded_data = pad_to_even(data)
+    case Base.decode16(padded_data, case: :mixed) do
+      {:ok, decoded_binary} -> decoded_binary
+      _ -> data
+    end
+  end
+  defp to_buffer(data), do: data
+
+  defp pad_to_even(data) do
+    if rem(String.length(data), 2) == 1 do
+      "0#{data}"
+    else
+      data
+    end
+  end
 end

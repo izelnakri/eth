@@ -19,9 +19,13 @@ defmodule ETH.TransactionsTest do
   #
   # end
 
-  # test "can get transactions sender address after signing it" do
-  #
-  # end
+  test "can get transactions sender address after signing it" do
+    @transactions |> Enum.each(fn(transaction) ->
+      transaction_params = ETH.Transaction.decode_transaction_list(transaction.raw)
+      signature = ETH.Transaction.sign_transaction(transaction_params, transaction.privateKey)
+      assert ETH.Transaction.get_sender_address(signature) == transaction.sendersAddress
+    end)
+  end
 
   # test "can get transactions sender public kye after signing it" do
   #
