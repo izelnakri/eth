@@ -57,6 +57,10 @@ defmodule ETH.Utils do
     [signature: signature, recovery: recovery]
   end
 
+  def secp256k1_recover(signature) do
+    
+  end
+
   def keccak256(data), do: :keccakf1600.hash(:sha3_256, data)
   def encode16(value), do: Base.encode16(value, case: :lower)
   def decode16(value), do: Base.decode16!(value, case: :mixed)

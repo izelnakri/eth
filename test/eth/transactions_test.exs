@@ -1,3 +1,4 @@
+require IEx
 defmodule ETH.TransactionsTest do
   use ExUnit.Case
 
@@ -19,15 +20,23 @@ defmodule ETH.TransactionsTest do
   #
   # end
 
-  test "can get transactions sender address after signing it" do
-    @transactions |> Enum.each(fn(transaction) ->
-      transaction_params = ETH.Transaction.decode_transaction_list(transaction.raw)
-      signature = ETH.Transaction.sign_transaction(transaction_params, transaction.privateKey)
-      assert ETH.Transaction.get_sender_address(signature) == transaction.sendersAddress
-    end)
-  end
+  # test "can get transactions sender address after signing it" do
+  #   @transactions |> Enum.each(fn(transaction) ->
+  #     private_key = Map.get(transaction, "privateKey")
+  #     senders_address = Map.get(transaction, "sendersAddress")
+  #     if private_key != nil do
+  #       decoded_private_key = Base.decode16!(private_key, case: :mixed)
+  #       # IO.inspect(decoded_private_key)
+  #       transaction_params = ETH.Transaction.decode_transaction_list(Map.get(transaction, "raw"))
+  #       IEx.pry
+  #       signature = ETH.Transaction.sign_transaction(transaction_params, decoded_private_key)
+  #       IEx.pry
+  #       assert ETH.Transaction.get_sender_address(signature) == senders_address
+  #     end
+  #   end)
+  # end
 
-  # test "can get transactions sender public kye after signing it" do
+  # test "can get transactions sender public key after signing it" do
   #
   # end
 
@@ -36,7 +45,9 @@ defmodule ETH.TransactionsTest do
   # there are upfront gas/costs tests that we probably dont need
 
   # test "verify EIP155 Signature based on Vitalik\'s tests" do
-  #
+  #   @eip155_transactions |> Enum.each(fn(transaction) ->
+  #     IEx.pry
+  #   end)
   # end
 end
 
