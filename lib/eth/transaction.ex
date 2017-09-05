@@ -40,6 +40,9 @@ defmodule ETH.Transaction do
       r: to_buffer(r), s: to_buffer(s)
     }
   end
+  # def parse(params) do
+  #   # add default values
+  # end
 
   def buffer_to_map(_transaction_buffer = [nonce, gas_price, gas_limit, to, value, data, v, r, s]) do
     %{
@@ -47,11 +50,6 @@ defmodule ETH.Transaction do
       v: v, r: r, s: s
     }
   end
-
-  # def parse(params) do
-  #   # add default values
-  # end
-
 
   def set(params = [from: from, to: to, value: value]) do
     gas_price = Keyword.get(params, :gas_price, ETH.Query.gas_price())
@@ -103,16 +101,14 @@ defmodule ETH.Transaction do
   def hash_transaction(transaction = %{
     to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
     nonce: _nonce
-  }) do
-    chain_id = Map.get(transaction, :chain_id, 0)
+  }, include_signature \\ true) do
+    chain_id = get_chain_id(Map.get(transaction, :v, <<28>>), Map.get(transaction, :chain_id))
+
     transaction
-    |> Map.merge(%{v: encode16(<<chain_id>>), r: <<>>, s: <<>>})
+    # |> Map.merge(%{v: Map.get(transaction, :v, <<28>>)})
     |> to_list
-    |> Enum.map(fn(x) ->
-      # IEx.pry
-      Base.decode16!(x, case: :mixed)
-    end)
-    |> hash
+    |> List.insert_at(-1, chain_id)
+    |> hash(include_signature)
   end
 
   def hash(transaction_list, include_signature \\ true) do # NOTE: use internally
@@ -123,14 +119,13 @@ defmodule ETH.Transaction do
         # when computing the hash of a transaction for purposes of signing or recovering,
         # instead of hashing only the first six elements (ie. nonce, gasprice, startgas, to, value, data),
         # hash nine elements, with v replaced by CHAIN_ID, r = 0 and s = 0
-        list = transaction_list |> Enum.take(6)
-        v = transaction_list |> Enum.at(6)
-        chain_id = get_chain_id(v)
-        if chain_id > 0, do: list ++ [chain_id, "", ""], else: list # NOTE: this part is dangerous: in JS we change state(v: chainId, r: 0, s: 0)
+        list = Enum.take(transaction_list, 6)
+        v = Enum.at(transaction_list, 6) || <<28>>
+        chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
+        if chain_id > 0, do: list ++ [chain_id, 0, 0], else: list
     end
 
     target_list
-    |> Enum.map(fn(value) -> to_buffer(value) end)
     |> ExRLP.encode
     |> keccak256
   end
@@ -141,13 +136,14 @@ defmodule ETH.Transaction do
   }, << private_key :: binary-size(32) >>) do
     hash = hash_transaction(transaction)
     IO.puts("hash is")
-    # IO.puts(hash)
+    IO.puts(hash)
     [signature: signature, recovery: recovery] = secp256k1_signature(hash, private_key)
 
     << r :: binary-size(32) >> <> << s :: binary-size(32) >> = signature
 
+    # this will change v, r, s
     transaction
-    |> Map.merge(%{r: encode16(r), s: encode16(s), v: encode16(<<recovery + 27>>)})
+    # |> Map.merge(%{r: encode16(r), s: encode16(s), v: encode16(<<recovery + 27>>)})
     |> adjust_v_for_chain_id
     |> to_list
     |> Enum.map(fn(x) ->
@@ -172,13 +168,20 @@ defmodule ETH.Transaction do
   end
 
   def to_list(transaction = %{
+    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data,
+    v: v, r: r, s: s
+  }) do
+    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
+    |> Enum.map(fn(value) -> to_buffer(value) end)
+  end
+  def to_list(transaction = %{
     nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data
   }) do
-    v = Map.get(transaction, :v, Base.encode16(<<28>>, case: :lower)) # this probably needs to change
+    v = Map.get(transaction, :v, <<28>>)
     r = Map.get(transaction, :r, "")
     s = Map.get(transaction, :s, "")
 
-    [nonce, gas_price, gas_limit, to, value, data, v, r, s] # NOTE: maybe this should turn things toBuffer
+    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
     |> Enum.map(fn(value) -> to_buffer(value) end)
   end
 
@@ -208,12 +211,18 @@ defmodule ETH.Transaction do
   def to_hex(value), do: HexPrefix.encode(value)
   # def to_json() # transaction_map or transaction_list
 
-  defp get_chain_id("0x" <> v) do
+
+
+  def get_chain_id(v, chain_id \\ nil) do
+    computed_chain_id = compute_chain_id(v)
+    if computed_chain_id == 0, do: (chain_id || 0), else: computed_chain_id
+  end
+  defp compute_chain_id("0x" <> v) do
     sig_v = buffer_to_int(v)
     chain_id = Float.floor((sig_v - 35) / 2)
     if chain_id < 0, do: 0, else: Kernel.trunc(chain_id)
   end
-  defp get_chain_id(v) do
+  defp compute_chain_id(v) do
     sig_v = buffer_to_int(v)
     chain_id = Float.floor((sig_v - 35) / 2)
     if chain_id < 0, do: 0, else: Kernel.trunc(chain_id)
@@ -234,8 +243,11 @@ defmodule ETH.Transaction do
 
   def to_buffer(nil), do: ""
   def to_buffer(data) when is_number(data) do
-    pad_to_even(Integer.to_string(data, 16)) |> Base.decode16!(case: :mixed)
+    padded_data = pad_to_even(Integer.to_string(data, 16))
+    # IEx.pry
+    padded_data
   end
+  def to_buffer("0x00"), do: ""
   def to_buffer("0x" <> data) do
     padded_data = pad_to_even(data)
     case Base.decode16(padded_data, case: :mixed) do

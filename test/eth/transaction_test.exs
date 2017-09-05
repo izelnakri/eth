@@ -4,31 +4,28 @@ defmodule ETH.TransactionTest do
   import ETH.Utils
   # TODO: "it should decode transactions"
 
-  @first_transaction_list [
-    "", "09184e72a000", "2710", "0000000000000000000000000000000000000000", "",
-    "7f7465737432000000000000000000000000000000000000000000000000000000600057", "29",
-    "f2d54d3399c9bcd3ac3482a5ffaeddfe68e9a805375f626b4f2f8cf530c2d95a",
-    "5b3bb54e6e8db52083a9b674e578c843a87c292f0383ddba168573808d36dc8e"
-  ] |> Enum.map(fn(x) -> decode16(x) end)
-
   @first_example_wallet %{
     private_key: "e331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109"
   }
   @first_example_transaction %{
-    nonce: "",
-    gas_price: "09184e72a000",
-    gas_limit: "2710",
-    to: "0000000000000000000000000000000000000000",
-    value: "",
-    data: "7f7465737432000000000000000000000000000000000000000000000000000000600057",
+    nonce: "0x00",
+    gas_price: "0x09184e72a000",
+    gas_limit: "0x2710",
+    to: "0x0000000000000000000000000000000000000000",
+    value: "0x00",
+    data: "0x7f7465737432000000000000000000000000000000000000000000000000000000600057",
     chain_id: 3 # EIP 155 chainId - mainnet: 1, ropsten: 3
   }
   @transactions File.read!("test/fixtures/transactions.json") |> Poison.decode!
   @eip155_transactions File.read!("test/fixtures/eip155_vitalik_tests.json") |> Poison.decode!
 
   test "hash/1 works" do
-    target_hash = "5C207A650B59A8C2D1271F5CBDA78A658CB411A87271D68062E61AB1A3F85CF9"
-    assert ETH.Transaction.hash(@first_transaction_list) |> Base.encode16 == target_hash
+    target_hash = "DF2A7CB6D05278504959987A144C116DBD11CBDC50D6482C5BAE84A7F41E2113"
+    assert @first_example_transaction
+      |> ETH.Transaction.to_list
+      |> List.insert_at(-1, @first_example_transaction.chain_id)
+      |> ETH.Transaction.hash(false)
+      |> Base.encode16 == target_hash
 
     first_transaction_list = @transactions
       |> Enum.at(2)
@@ -64,9 +61,11 @@ defmodule ETH.TransactionTest do
   end
 
   test "hash_transaction/2 works" do
-    result = ETH.Transaction.hash_transaction(@first_example_transaction) |> Base.encode16(case: :lower)
-    target_digest = "df2a7cb6d05278504959987a144c116dbd11cbdc50d6482c5bae84a7f41e2113"
-    assert result == target_digest
+    result = @first_example_transaction
+      |> ETH.Transaction.hash_transaction(false)
+      |> Base.encode16(case: :lower)
+
+    assert result == "df2a7cb6d05278504959987a144c116dbd11cbdc50d6482c5bae84a7f41e2113"
   end
 
   test "sign/2 works" do
