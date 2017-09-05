@@ -19,6 +19,22 @@ defmodule ETH.TransactionTest do
   @transactions File.read!("test/fixtures/transactions.json") |> Poison.decode!
   @eip155_transactions File.read!("test/fixtures/eip155_vitalik_tests.json") |> Poison.decode!
 
+  test "parse/1 and list/1 works for 0x hexed transactions" do
+    @transactions
+    |> Enum.slice(0..3)
+    |> Enum.map(fn(transaction) -> transaction["raw"] end)
+    |> Enum.each(fn(transaction) ->
+      transaction_list = transaction |> ETH.Transaction.parse |> ETH.Transaction.to_list
+
+      transaction_list
+      |> Stream.with_index
+      |> Enum.each(fn({value, index}) ->
+        encoded_buffer = Enum.at(transaction_list, index) |> Base.encode16(case: :lower)
+        assert Enum.at(transaction, index) == "0x#{encoded_buffer}"
+      end)
+    end)
+  end
+
   test "hash/1 works" do
     target_hash = "DF2A7CB6D05278504959987A144C116DBD11CBDC50D6482C5BAE84A7F41E2113"
     assert @first_example_transaction
@@ -68,11 +84,23 @@ defmodule ETH.TransactionTest do
     assert result == "df2a7cb6d05278504959987a144c116dbd11cbdc50d6482c5bae84a7f41e2113"
   end
 
-  test "sign/2 works" do
-    signature = ETH.Transaction.sign(@first_example_transaction, @first_example_wallet.private_key)
-      |> Base.encode16(case: :lower)
-    assert signature == "f889808609184e72a00082271094000000000000000000000000000000000000000080a47f746573743200000000000000000000000000000000000000000000000000000060005729a0f2d54d3399c9bcd3ac3482a5ffaeddfe68e9a805375f626b4f2f8cf530c2d95aa05b3bb54e6e8db52083a9b674e578c843a87c292f0383ddba168573808d36dc8e"
+  test "get_sender_address works" do
+    transactons = @transactions
+    |> Enum.slice(0..2)
+    |> Enum.each(fn(transaction) ->
+      transaction_list = transaction |> Map.get("raw") |> ETH.Transaction.parse |> ETH.Transaction.to_list
+
+      result = ETH.Transaction.get_sender_address(transaction_list)
+      assert result == "0x" <> String.upcase(transaction["sendersAddress"])
+    end)
   end
+
+
+  # test "sign/2 works" do
+  #   signature = ETH.Transaction.sign(@first_example_transaction, @first_example_wallet.private_key)
+  #     |> Base.encode16(case: :lower)
+  #   assert signature == "f889808609184e72a00082271094000000000000000000000000000000000000000080a47f746573743200000000000000000000000000000000000000000000000000000060005729a0f2d54d3399c9bcd3ac3482a5ffaeddfe68e9a805375f626b4f2f8cf530c2d95aa05b3bb54e6e8db52083a9b674e578c843a87c292f0383ddba168573808d36dc8e"
+  # end
 
   # def decode16(value), do: Base.decode16!(value, case: :mixed)
 end

@@ -1,4 +1,5 @@
 require IEx
+# NOTE: maybe chain_id for parse to persist?
 
 defmodule ETH.Transaction do
   import ETH.Utils
@@ -40,6 +41,25 @@ defmodule ETH.Transaction do
       r: to_buffer(r), s: to_buffer(s)
     }
   end
+
+  def to_list(transaction = %{
+    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data,
+    v: v, r: r, s: s
+  }) do
+    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
+    |> Enum.map(fn(value) -> to_buffer(value) end)
+  end
+  def to_list(transaction = %{
+    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data
+  }) do
+    v = Map.get(transaction, :v, <<28>>)
+    r = Map.get(transaction, :r, "")
+    s = Map.get(transaction, :s, "")
+
+    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
+    |> Enum.map(fn(value) -> to_buffer(value) end)
+  end
+
   # def parse(params) do
   #   # add default values
   # end
@@ -70,6 +90,20 @@ defmodule ETH.Transaction do
     |> Enum.into(%{})
   end
 
+  def get_sender_address(transaction_list = [nonce, gas_price, gas_limit, to, value, data, v, r, s]) do
+    message_hash = hash(transaction_list, false)
+    chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
+    v_int = buffer_to_int(v)
+    target_v = if chain_id > 0, do: v_int - (chain_id * 2 + 8), else: v_int
+
+    # NOTE: check if the below is correct:
+    signature = r <> s
+    recovery_id = target_v - 27
+
+    {:ok, public_key} = :libsecp256k1.ecdsa_recover_compact(message_hash, signature, :uncompressed, recovery_id)
+    get_address(public_key)
+  end
+
   def sign(transaction = %{
     to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
     nonce: _nonce
@@ -96,8 +130,6 @@ defmodule ETH.Transaction do
     |> send
   end
 
-  # NOTE: if transaction is decoded no need to encode
-
   def hash_transaction(transaction = %{
     to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
     nonce: _nonce
@@ -105,13 +137,12 @@ defmodule ETH.Transaction do
     chain_id = get_chain_id(Map.get(transaction, :v, <<28>>), Map.get(transaction, :chain_id))
 
     transaction
-    # |> Map.merge(%{v: Map.get(transaction, :v, <<28>>)})
     |> to_list
     |> List.insert_at(-1, chain_id)
     |> hash(include_signature)
   end
 
-  def hash(transaction_list, include_signature \\ true) do # NOTE: use internally
+  def hash(transaction_list, include_signature \\ true) when is_list(transaction_list) do # NOTE: use internally
     target_list = case include_signature do
       true -> transaction_list
       false ->
@@ -167,24 +198,6 @@ defmodule ETH.Transaction do
     end
   end
 
-  def to_list(transaction = %{
-    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data,
-    v: v, r: r, s: s
-  }) do
-    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
-    |> Enum.map(fn(value) -> to_buffer(value) end)
-  end
-  def to_list(transaction = %{
-    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data
-  }) do
-    v = Map.get(transaction, :v, <<28>>)
-    r = Map.get(transaction, :r, "")
-    s = Map.get(transaction, :s, "")
-
-    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
-    |> Enum.map(fn(value) -> to_buffer(value) end)
-  end
-
   # def decode_transaction_list(transaction_list) when is_list(transaction_list) do
   #   encoded_list = transaction_list |> Enum.map(fn(value) -> Base.encode16(buffer_decoder(value)) end)
   #
@@ -208,10 +221,7 @@ defmodule ETH.Transaction do
   #   end
   # end
 
-  def to_hex(value), do: HexPrefix.encode(value)
   # def to_json() # transaction_map or transaction_list
-
-
 
   def get_chain_id(v, chain_id \\ nil) do
     computed_chain_id = compute_chain_id(v)
@@ -233,9 +243,6 @@ defmodule ETH.Transaction do
     <<number>> = to_buffer(data)
     number
   end
-
-  # defp buffer_decoder("0x"), do: ""
-  # defp buffer_decoder("0x" <> data), do: Base.decode16!(data, case: :mixed)
 
   defp buffer_to_json_value(data) do
     "0x" <> Base.encode16(data, case: :mixed)
