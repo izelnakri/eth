@@ -30,16 +30,22 @@ defmodule ETH.TransactionTest do
     target_hash = "5C207A650B59A8C2D1271F5CBDA78A658CB411A87271D68062E61AB1A3F85CF9"
     assert ETH.Transaction.hash(@first_transaction_list) |> Base.encode16 == target_hash
 
-    first_transaction_list = @transactions |> Enum.at(2) |> Map.get("raw")
-    second_transaction_list = @transactions |> Enum.at(3) |> Map.get("raw")
-      # |> ETH.Transaction.parse |> ETH.Transaction.to_list
-    IO.inspect(first_transaction_list)
+    first_transaction_list = @transactions
+      |> Enum.at(2)
+      |> Map.get("raw")
+      |> ETH.Transaction.parse
+      |> ETH.Transaction.to_list
+
+    second_transaction_list = @transactions
+      |> Enum.at(3)
+      |> Map.get("raw")
+      |> ETH.Transaction.parse
+      |> ETH.Transaction.to_list
 
     assert ETH.Transaction.hash(first_transaction_list) == decode16("375a8983c9fc56d7cfd118254a80a8d7403d590a6c9e105532b67aca1efb97aa")
     assert ETH.Transaction.hash(first_transaction_list, false) == decode16("61e1ec33764304dddb55348e7883d4437426f44ab3ef65e6da1e025734c03ff0")
     assert ETH.Transaction.hash(first_transaction_list, true) == decode16("375a8983c9fc56d7cfd118254a80a8d7403d590a6c9e105532b67aca1efb97aa")
 
-    IEx.pry
     assert ETH.Transaction.hash(second_transaction_list) == decode16("0f09dc98ea85b7872f4409131a790b91e7540953992886fc268b7ba5c96820e4")
     assert ETH.Transaction.hash(second_transaction_list, true) == decode16("0f09dc98ea85b7872f4409131a790b91e7540953992886fc268b7ba5c96820e4")
     assert ETH.Transaction.hash(second_transaction_list, false) == decode16("f97c73fdca079da7652dbc61a46cd5aeef804008e057be3e712c43eac389aaf0")

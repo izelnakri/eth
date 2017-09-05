@@ -12,31 +12,31 @@ defmodule ETH.Transaction do
   def parse([nonce, gas_price, gas_limit, to, value, data]) do
     %{
       nonce: to_buffer(nonce), gas_price: to_buffer(gas_price), gas_limit: to_buffer(gas_limit),
-      to: to_buffer(to), value: to_buffer(to), data: to_buffer(data)
+      to: to_buffer(to), value: to_buffer(value), data: to_buffer(data)
     }
   end
   def parse([nonce, gas_price, gas_limit, to, value, data, v, r, s]) do
     %{
       nonce: to_buffer(nonce), gas_price: to_buffer(gas_price), gas_limit: to_buffer(gas_limit),
-      to: to_buffer(to), value: to_buffer(to), data: to_buffer(data), v: to_buffer(v),
+      to: to_buffer(to), value: to_buffer(value), data: to_buffer(data), v: to_buffer(v),
       r: to_buffer(r), s: to_buffer(s)
     }
   end
   def parse(%{
-    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: to, data: data
+    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data
   }) do
     %{
       nonce: to_buffer(nonce), gas_price: to_buffer(gas_price), gas_limit: to_buffer(gas_limit),
-      to: to_buffer(to), value: to_buffer(to), data: to_buffer(data)
+      to: to_buffer(to), value: to_buffer(value), data: to_buffer(data)
     }
   end
   def parse(%{
-    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: to, data: data,
+    nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data,
     v: v, r: r, s: s
   }) do
     %{
       nonce: to_buffer(nonce), gas_price: to_buffer(gas_price), gas_limit: to_buffer(gas_limit),
-      to: to_buffer(to), value: to_buffer(to), data: to_buffer(data), v: to_buffer(v),
+      to: to_buffer(to), value: to_buffer(value), data: to_buffer(data), v: to_buffer(v),
       r: to_buffer(r), s: to_buffer(s)
     }
   end
@@ -221,7 +221,7 @@ defmodule ETH.Transaction do
 
   # defp buffer_to_int(""), do: 0
   defp buffer_to_int(data) do
-    {number, _} = Integer.parse(data, 16)
+    <<number>> = to_buffer(data)
     number
   end
 
@@ -232,20 +232,18 @@ defmodule ETH.Transaction do
     "0x" <> Base.encode16(data, case: :mixed)
   end
 
-  defp to_buffer(nil), do: ""
-  defp to_buffer(data) when is_number(data) do
-    IO.puts("NUMBER CALLED")
-    IEx.pry
-    pad_to_even(Hexate.encode(data)) |> Base.decode16!(case: :mixed)
+  def to_buffer(nil), do: ""
+  def to_buffer(data) when is_number(data) do
+    pad_to_even(Integer.to_string(data, 16)) |> Base.decode16!(case: :mixed)
   end
-  defp to_buffer("0x" <> data) do
+  def to_buffer("0x" <> data) do
     padded_data = pad_to_even(data)
     case Base.decode16(padded_data, case: :mixed) do
       {:ok, decoded_binary} -> decoded_binary
       _ -> data
     end
   end
-  defp to_buffer(data), do: data # NOTE: to_buffer else if (v === null || v === undefined) { v = Buffer.allocUnsafe(0) }
+  def to_buffer(data), do: data # NOTE: to_buffer else if (v === null || v === undefined) { v = Buffer.allocUnsafe(0) }
 
   def pad_to_even(data) do
     if rem(String.length(data), 2) == 1, do: "0#{data}", else: data
