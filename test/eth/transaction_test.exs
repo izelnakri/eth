@@ -19,7 +19,7 @@ defmodule ETH.TransactionTest do
   @transactions File.read!("test/fixtures/transactions.json") |> Poison.decode!
   @eip155_transactions File.read!("test/fixtures/eip155_vitalik_tests.json") |> Poison.decode!
 
-  test "parse/1 and list/1 works for 0x hexed transactions" do
+  test "parse/1 and to_list/1 works for 0x hexed transactions" do
     @transactions
     |> Enum.slice(0..3)
     |> Enum.map(fn(transaction) -> transaction["raw"] end)
@@ -84,7 +84,7 @@ defmodule ETH.TransactionTest do
     assert result == "df2a7cb6d05278504959987a144c116dbd11cbdc50d6482c5bae84a7f41e2113"
   end
 
-  test "get_sender_address works" do
+  test "get_sender_address/1 works" do
     transactons = @transactions
     |> Enum.slice(0..2)
     |> Enum.each(fn(transaction) ->
@@ -95,6 +95,20 @@ defmodule ETH.TransactionTest do
     end)
   end
 
+  test "sign/2 works" do
+    transactons = @transactions
+    |> Enum.slice(0..2)
+    |> Enum.each(fn(transaction) ->
+      signed_transaction_list = transaction
+        |> Map.get("raw")
+        |> ETH.Transaction.parse
+        |> ETH.Transaction.to_list
+        |> ETH.Transaction.sign(transaction["privateKey"])
+
+      result = ETH.Transaction.get_sender_address(signed_transaction_list)
+      assert result == "0x" <> String.upcase(transaction["sendersAddress"])
+    end)
+  end
 
   # test "sign/2 works" do
   #   signature = ETH.Transaction.sign(@first_example_transaction, @first_example_wallet.private_key)
