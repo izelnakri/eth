@@ -16,6 +16,7 @@ defmodule ETH.Transaction.Signer do
     |> List.insert_at(-1, chain_id)
     |> hash_transaction_list(include_signature)
   end
+
   # def hash_transaction(transaction=%{}, include_signature) do # TODO: check if this is necessary
   #   chain_id = get_chain_id(Map.get(transaction, :v, <<28>>), Map.get(transaction, :chain_id))
   #
@@ -45,6 +46,12 @@ defmodule ETH.Transaction.Signer do
     target_list
     |> ExRLP.encode
     |> keccak256
+  end
+
+  def decode(<<rlp_encoded_transaction_list>>), do: ExRLP.decode(rlp_encoded_transaction_list)
+
+  def encode(transaction_list = [_nonce, _gas_price, _gas_limit, _to, _value, _data, _v, _r, _s]) do
+    ExRLP.encode(transaction_list)
   end
 
   def sign_transaction(transaction, private_key) when is_map(transaction) do
