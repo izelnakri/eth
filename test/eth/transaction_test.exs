@@ -111,13 +111,18 @@ defmodule ETH.TransactionTest do
 
   test "verify EIP155 Signature based on Vitalik\'s tests" do
     @eip155_transactions |> Enum.each(fn(transaction) ->
-      transaction_list = transaction |> Map.get("rlp") |> ETH.Transaction.parse
+      transaction_list = transaction |> Map.get("rlp") |> ETH.Transaction.to_list
       expected_hash = transaction["hash"] |> Base.decode16!(case: :lower)
       assert ETH.Transaction.hash(transaction_list, false) == expected_hash
       sender_address = transaction["sender"] |> String.upcase
       assert ETH.Transaction.get_sender_address(transaction_list) == "0x#{sender_address}"
     end)
   end
+
+  # NOTE: probably not needed changes th API
+  # test "can sign an empty transaction with right chain id" do
+  #   ETH.Transaction.hash_transaction(%{chain_id: 42 })
+  # end
 
   # test "sign works" do
   #   signature = ETH.Transaction.sign_transaction_list(@first_example_transaction, @first_example_wallet.private_key)

@@ -1,33 +1,6 @@
-- hexate encode all values
-- transaction tests
-- maybe implement verify signature
-- get_sender_address
-- get_sender_public_key
-- maybe pad/unpad functions
-- maybe from unsigned / to signed
 - check ethUtils.hashPersonalMessage
-- check toChecksumAddress + isValidChecksumAddress
-- fromRPCtoSig, toRPCSig
-
-- rlp exports.toBuffer(x) behavior might be different that the one I use
-
-.toBuffer(x) is:
-  if (exports.isHexString(v)) {
-        v = Buffer.from(exports.padToEven(exports.stripHexPrefix(v)), 'hex')
-  elseif (isNumber) {
-  intToBuffer
-  } else if (isNull || isUndefined) {
-  allocUnsafe(0)
-  }
-
-function intToHex (i) {
-  var hex = i.toString(16)
-  if (hex.length % 2) {
-    hex = '0' + hex
-  }
-
-  return hex
-}
+- maybe ICAP check toChecksumAddress + isValidChecksumAddress
+- maybe fromRPCtoSig, toRPCSig
 
 
 describe('message sig', function () {
@@ -62,21 +35,3 @@ describe('message sig', function () {
     })
   })
 })
-
-
-function setter (v) {
-  v = exports.toBuffer(v)
-
-  if (v.toString('hex') === '00' && !field.allowZero) {
-    v = Buffer.allocUnsafe(0)
-  }
-
-  if (field.allowLess && field.length) {
-    v = exports.stripZeros(v)
-    assert(field.length >= v.length, 'The field ' + field.name + ' must not have more ' + field.length + ' bytes')
-  } else if (!(field.allowZero && v.length === 0) && field.length) {
-    assert(field.length === v.length, 'The field ' + field.name + ' must have byte length of ' + field.length)
-  }
-
-  self.raw[i] = v
-}
