@@ -1,19 +1,34 @@
 defmodule ETH.Transaction.Signer do
   import ETH.Utils
 
-  def sign_transaction_list(transaction_list = [
-    nonce, gas_price, gas_limit, to, value, data, v, r, s
-  ], << private_key :: binary-size(32) >>) do
-    to_signed_transaction_list(transaction_list, private_key)
-  end
-  def sign_transaction_list(transaction_list = [
-    nonce, gas_price, gas_limit, to, value, data, v, r, s
-  ], << encoded_private_key :: binary-size(64) >>) do
-    decoded_private_key = Base.decode16!(encoded_private_key, case: :mixed)
-    to_signed_transaction_list(transaction_list, decoded_private_key)
-  end
+  alias ETH.Transaction.Parser, as: TransactionParser
 
-  def hash(transaction_list, include_signature \\ true) when is_list(transaction_list) do # NOTE: use internally
+  def hash_transaction(transaction, include_signature \\ true)
+  def hash_transaction(transaction = %{
+    to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
+    nonce: _nonce
+  }, include_signature) do
+    chain_id = get_chain_id(Map.get(transaction, :v, <<28>>), Map.get(transaction, :chain_id))
+
+    transaction
+    |> Map.delete(:chain_id)
+    |> TransactionParser.to_list
+    |> List.insert_at(-1, chain_id)
+    |> hash_transaction_list(include_signature)
+  end
+  # def hash_transaction(transaction=%{}, include_signature) do # TODO: check if this is necessary
+  #   chain_id = get_chain_id(Map.get(transaction, :v, <<28>>), Map.get(transaction, :chain_id))
+  #
+  #   transaction
+  #   |> Map.delete(:chain_id)
+  #   |> TransactionParser.to_list
+  #   |> List.insert_at(-1, chain_id)
+  #   |> hash_transaction_list(include_signature)
+  # end
+
+  def hash_transaction_list(
+    transaction_list, include_signature \\ true
+  ) when is_list(transaction_list) do # NOTE: usage is generally internal
     target_list = case include_signature do
       true -> transaction_list
       false ->
@@ -32,11 +47,30 @@ defmodule ETH.Transaction.Signer do
     |> keccak256
   end
 
+  def sign_transaction(transaction, private_key) when is_map(transaction) do
+    transaction
+    |> ETH.Transaction.to_list
+    |> sign_transaction_list(private_key)
+    |> ExRLP.encode
+  end
+
+  def sign_transaction_list(transaction_list = [
+    nonce, gas_price, gas_limit, to, value, data, v, r, s
+  ], << private_key :: binary-size(32) >>) do
+    to_signed_transaction_list(transaction_list, private_key)
+  end
+  def sign_transaction_list(transaction_list = [
+    nonce, gas_price, gas_limit, to, value, data, v, r, s
+  ], << encoded_private_key :: binary-size(64) >>) do
+    decoded_private_key = Base.decode16!(encoded_private_key, case: :mixed)
+    to_signed_transaction_list(transaction_list, decoded_private_key)
+  end
+
   defp to_signed_transaction_list(transaction_list = [
     nonce, gas_price, gas_limit, to, value, data, v, r, s
   ], << private_key :: binary-size(32) >>) do # NOTE: this part is problematic
     chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
-    message_hash = hash(transaction_list, false)
+    message_hash = hash_transaction_list(transaction_list, false)
 
     [signature: signature, recovery: recovery] = secp256k1_signature(message_hash, private_key)
 
