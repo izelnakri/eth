@@ -1,6 +1,6 @@
 require IEx
 # NOTE: maybe chain_id for parse to persist?
-
+# NOTE: add ExRLP.encode() / .serialize() to complete this
 defmodule ETH.Transaction do
   import ETH.Utils
 
@@ -90,12 +90,12 @@ defmodule ETH.Transaction do
   #   |> Enum.into(%{})
   # end
 
-  def sign(transaction_list = [
+  def sign_transaction_list(transaction_list = [
     nonce, gas_price, gas_limit, to, value, data, v, r, s
   ], << private_key :: binary-size(32) >>) do
     to_signed_transaction_list(transaction_list, private_key)
   end
-  def sign(transaction_list = [
+  def sign_transaction_list(transaction_list = [
     nonce, gas_price, gas_limit, to, value, data, v, r, s
   ], << encoded_private_key :: binary-size(64) >>) do
     decoded_private_key = Base.decode16!(encoded_private_key, case: :mixed)
@@ -115,11 +115,11 @@ defmodule ETH.Transaction do
     get_address(public_key)
   end
 
-  # def sign(transaction = %{
+  # def sign_transaction_list(transaction = %{
   #   to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
   #   nonce: _nonce
   # }, << private_key :: binary-size(32) >>), do: sign_transaction(transaction, private_key)
-  # def sign(transaction = %{
+  # def sign_transaction_list(transaction = %{
   #   to: _to, value: _value, data: _data, gas_price: _gas_price, gas_limit: _gas_limit,
   #   nonce: _nonce
   # }, << encoded_private_key :: binary-size(64) >>) do
@@ -131,13 +131,13 @@ defmodule ETH.Transaction do
 
   # def send_transaction(params = [from: _from, to: _to, value: _value], private_key) do
   #   set(params)
-  #   |> sign(private_key)
+  #   |> sign_transaction_list(private_key)
   #   |> send
   # end
   # def send_transaction(params = %{from: _from, to: _to, value: _value}, private_key) do
   #   Map.to_list(params)
   #   |> set
-  #   |> sign(private_key)
+  #   |> sign_transaction_list(private_key)
   #   |> send
   # end
 

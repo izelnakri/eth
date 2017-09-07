@@ -2,7 +2,6 @@ require IEx
 defmodule ETH.TransactionTest do
   use ExUnit.Case
   import ETH.Utils
-  # TODO: "it should decode transactions"
 
   @first_example_wallet %{
     private_key: "e331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109"
@@ -103,37 +102,26 @@ defmodule ETH.TransactionTest do
         |> Map.get("raw")
         |> ETH.Transaction.parse
         |> ETH.Transaction.to_list
-        |> ETH.Transaction.sign(transaction["privateKey"])
+        |> ETH.Transaction.sign_transaction_list(transaction["privateKey"])
 
       result = ETH.Transaction.get_sender_address(signed_transaction_list)
       assert result == "0x" <> String.upcase(transaction["sendersAddress"])
     end)
   end
 
-  # test "sign/2 works" do
-  #   signature = ETH.Transaction.sign(@first_example_transaction, @first_example_wallet.private_key)
+  test "verify EIP155 Signature based on Vitalik\'s tests" do
+    @eip155_transactions |> Enum.each(fn(transaction) ->
+      transaction_list = transaction |> Map.get("rlp") |> ETH.Transaction.parse
+      expected_hash = transaction["hash"] |> Base.decode16!(case: :lower)
+      assert ETH.Transaction.hash(transaction_list, false) == expected_hash
+      sender_address = transaction["sender"] |> String.upcase
+      assert ETH.Transaction.get_sender_address(transaction_list) == "0x#{sender_address}"
+    end)
+  end
+
+  # test "sign works" do
+  #   signature = ETH.Transaction.sign_transaction_list(@first_example_transaction, @first_example_wallet.private_key)
   #     |> Base.encode16(case: :lower)
   #   assert signature == "f889808609184e72a00082271094000000000000000000000000000000000000000080a47f746573743200000000000000000000000000000000000000000000000000000060005729a0f2d54d3399c9bcd3ac3482a5ffaeddfe68e9a805375f626b4f2f8cf530c2d95aa05b3bb54e6e8db52083a9b674e578c843a87c292f0383ddba168573808d36dc8e"
   # end
-
-  # def decode16(value), do: Base.decode16!(value, case: :mixed)
 end
-
-
-# this happens on each setting
-# function setter (v) {
-#   v = exports.toBuffer(v)
-#
-#   if (v.toString('hex') === '00' && !field.allowZero) {
-#     v = Buffer.allocUnsafe(0)
-#   }
-#
-#   if (field.allowLess && field.length) {
-#     v = exports.stripZeros(v)
-#     assert(field.length >= v.length, 'The field ' + field.name + ' must not have more ' + field.length + ' bytes')
-#   } else if (!(field.allowZero && v.length === 0) && field.length) {
-#     assert(field.length === v.length, 'The field ' + field.name + ' must have byte length of ' + field.length)
-#   }
-#
-#   self.raw[i] = v
-# }
