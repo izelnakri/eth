@@ -25,45 +25,48 @@ defmodule ETH.Transaction do
   end
 
   # TODO: what if its a wallet
-  def set(params = %{from: from, to: to, value: value}) do
+  def set(params) when is_list(params) do
     gas_price = Keyword.get(params, :gas_price, ETH.Query.gas_price())
     data = Keyword.get(params, :data, "")
-    nonce = Keyword.get(params, :nonce, ETH.Query.get_transaction_count(from))
+    nonce = Keyword.get(params, :nonce, ETH.Query.get_transaction_count(params[:from]))
     chain_id = Keyword.get(params, :chain_id, 3)
     gas_limit = Keyword.get(params, :gas_limit, ETH.Query.estimate_gas(%{
-      to: to, value: value, data: data, nonce: nonce, chain_id: chain_id
+      to: params[:to], value: params[:value], data: data, nonce: nonce, chain_id: chain_id
     }))
+    # gas_limit = 100000000
 
-    %{nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data}
+    %{
+      nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: params[:to],
+      value: params[:value], data: params[:data]
+    }
     |> parse
   end
-  def set(params = [from: from, to: to, value: value]) do
-    gas_price = Keyword.get(params, :gas_price, ETH.Query.gas_price())
-    data = Keyword.get(params, :data, "")
-    nonce = Keyword.get(params, :nonce, ETH.Query.get_transaction_count(from))
-    chain_id = Keyword.get(params, :chain_id, 3)
-    gas_limit = Keyword.get(params, :gas_limit, ETH.Query.estimate_gas(%{
-      to: to, value: value, data: data, nonce: nonce, chain_id: chain_id
+  def set(params) do
+    gas_price = Map.get(params, :gas_price, ETH.Query.gas_price())
+    data = Map.get(params, :data, "")
+    nonce = Map.get(params, :nonce, ETH.Query.get_transaction_count(params.from))
+    chain_id = Map.get(params, :chain_id, 3)
+    gas_limit = Map.get(params, :gas_limit, ETH.Query.estimate_gas(%{
+      to: params.to, value: params.value, data: data, nonce: nonce, chain_id: chain_id
     }))
+    # gas_limit = 100000000
 
-    %{nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data}
+    %{nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: params.to, value: params.value, data: data}
     |> parse
   end
 
+  def send_transaction(params, private_key) when is_list(params) do
+    params
+    |> set
+    |> sign_transaction(private_key)
+    # |> send
+  end
   # TODO: what if its a wallet
-  def send_transaction(params = %{from: _from, to: _to, value: _value}, private_key) do
+  def send_transaction(params, private_key) do
     params
     |> set
-    |> to_list
-    |> sign_transaction_list(private_key)
-    |> send
-  end
-  def send_transaction(params = [from: _from, to: _to, value: _value], private_key) do
-    params
-    |> set
-    |> to_list
-    |> sign_transaction_list(private_key)
-    |> send
+    |> sign_transaction(private_key)
+    # |> send
   end
 
   def send(signature), do: Ethereumex.HttpClient.eth_send_raw_transaction([signature])

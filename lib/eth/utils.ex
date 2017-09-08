@@ -62,7 +62,13 @@ defmodule ETH.Utils do
   def decode16(value), do: Base.decode16!(value, case: :mixed)
 
   def to_buffer(nil), do: ""
-  def to_buffer(data) when is_number(data), do: pad_to_even(Integer.to_string(data, 16))
+  def to_buffer(0), do: ""
+  def to_buffer(data) when is_number(data) do
+    data
+    |> Integer.to_string(16)
+    |> pad_to_even
+    |> Base.decode16!(case: :mixed)
+  end
   def to_buffer("0x00"), do: ""
   def to_buffer("0x" <> data) do
     padded_data = pad_to_even(data)

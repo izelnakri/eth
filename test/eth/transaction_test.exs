@@ -119,6 +119,18 @@ defmodule ETH.TransactionTest do
     end)
   end
 
+
+
+  test "send_transaction_works" do
+    output = ETH.Transaction.send_transaction(%{
+      nonce: 1, to: "0x0dcd857b3c5db88cb7c025f0ef229331cfadffe5", value: 22, gas_limit: 100000,
+      gas_price: 1000, from: "0x42c343d8b77a9106d7112b71ba6b3030a34ba560"
+    }, "75c3b11e480f8ba3db792424bebda1fc8dea2b254287e3a9af9ed50c7d255720") |> Base.encode16(case: :lower)
+
+    serialized_hash = "f862018203e8830186a0940dcd857b3c5db88cb7c025f0ef229331cfadffe516801ba09b35467cf48151683b41ed8425d59317716f4f639126d7eb69167ac95c8c3ba3a00d5d21f4c6fc400202dadc09a192b011cc16aefa6155d4e5df15d77d9f6c8f9f"
+    assert output == serialized_hash
+  end
+
   # NOTE: probably not needed changes th API
   # test "can sign an empty transaction with right chain id" do
   #   ETH.Transaction.hash_transaction(%{chain_id: 42 })
