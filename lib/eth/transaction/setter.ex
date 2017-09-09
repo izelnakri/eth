@@ -13,8 +13,12 @@ defmodule ETH.Transaction.Setter do
   end
   def set(wallet, params) do
     result = cond do
-      is_map(params) -> set_params_from_map(params)
-      is_list(params) -> set_params_from_list(params)
+      is_map(params) ->
+        target_params = params |> Map.merge(%{from: wallet.eth_address})
+        set_params_from_map(target_params)
+      is_list(params) ->
+        target_params = params |> Keyword.merge([from: wallet.eth_address])
+        set_params_from_list(target_params)
     end
 
     parse(result)

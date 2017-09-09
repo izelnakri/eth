@@ -1,13 +1,13 @@
 defmodule ETH.Transaction do
   import ETH.Utils
 
-  alias ETH.Query
+  defdelegate parse(data), to: ETH.Transaction.Parser
+  defdelegate to_list(data), to: ETH.Transaction.Parser
 
   defdelegate set(params), to: ETH.Transaction.Setter
   defdelegate set(wallet, params), to: ETH.Transaction.Setter
-  defdelegate set(sender_wallet, receiver_wallet, params), to: ETH.Transaction.Setter
-  defdelegate parse(data), to: ETH.Transaction.Parser # NOTE: improve this one
-  defdelegate to_list(data), to: ETH.Transaction.Parser
+  defdelegate set(sender_wallet, receiver_wallet, params_or_value), to: ETH.Transaction.Setter
+
   defdelegate hash_transaction(transaction), to: ETH.Transaction.Signer
   defdelegate hash_transaction(transaction, include_signature), to: ETH.Transaction.Signer
   defdelegate hash_transaction_list(transaction_list), to: ETH.Transaction.Signer
@@ -71,17 +71,17 @@ defmodule ETH.Transaction do
 
   def get_senders_public_key("0x" <> rlp_encoded_transaction_list) do # NOTE: not tested
     rlp_encoded_transaction_list
-    |> ExRLP.decode
+    |> Base.decode16!(case: :mixed)
     |> to_senders_public_key
   end
   def get_senders_public_key(<<encoded_tx>>) do
     encoded_tx
-    |> Base.decode(case: :mixed)
+    |> Base.decode16!(case: :mixed)
     |> ExRLP.decode
     |> to_senders_public_key
   end
   def get_senders_public_key(transaction_list = [
-    nonce, gas_price, gas_limit, to, value, data, v, r, s
+    _nonce, _gas_price, _gas_limit, _to, _value, _data, _v, _r, _s
   ]), do: to_senders_public_key(transaction_list)
 
   def get_sender_address("0x" <> rlp_encoded_transaction_list) do # NOTE: not tested
@@ -92,17 +92,17 @@ defmodule ETH.Transaction do
   end
   def get_sender_address(<<encoded_tx>>) do
     encoded_tx
-    |> Base.decode(case: :mixed)
+    |> Base.decode16!(case: :mixed)
     |> ExRLP.decode
     |> to_senders_public_key
     |> get_address
   end
   def get_sender_address(transaction_list = [
-    nonce, gas_price, gas_limit, to, value, data, v, r, s
+    _nonce, _gas_price, _gas_limit, _to, _value, _data, _v, _r, _s
   ]), do: get_senders_public_key(transaction_list) |> get_address
 
   defp to_senders_public_key(transaction_list = [
-    nonce, gas_price, gas_limit, to, value, data, v, r, s
+    _nonce, _gas_price, _gas_limit, _to, _value, _data, v, r, s
   ]) do
     message_hash = hash_transaction_list(transaction_list, false)
     chain_id = get_chain_id(v, Enum.at(transaction_list, 9))

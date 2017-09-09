@@ -16,6 +16,11 @@ defmodule ETH.Query do
     |> get_result
   end
 
+  def gas_price do
+    Ethereumex.HttpClient.eth_gas_price()
+    |> get_number_result
+  end
+
   def call(call_params) do
     Ethereumex.HttpClient.eth_call([call_params])
     |> get_result
@@ -83,13 +88,8 @@ defmodule ETH.Query do
     |> get_number_result
   end
 
-  def gas_price do
-    Ethereumex.HttpClient.eth_gas_price()
-    |> get_number_result
-  end
-
   def estimate_gas(transaction \\ %{data: ""})
-  def estimate_gas(transaction = %{to: to, data: data}) do
+  def estimate_gas(transaction = %{to: _to, data: _data}) do
     Ethereumex.HttpClient.eth_estimate_gas([transaction])
     |> get_number_result
   end

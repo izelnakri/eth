@@ -52,20 +52,20 @@ defmodule ETH.Transaction.Signer do
   end
 
   def sign_transaction_list(transaction_list = [
-    nonce, gas_price, gas_limit, to, value, data, v, r, s
+    _nonce, _gas_price, _gas_limit, _to, _value, _data, _v, _r, _s
   ], << private_key :: binary-size(32) >>) do
     to_signed_transaction_list(transaction_list, private_key)
   end
   def sign_transaction_list(transaction_list = [
-    nonce, gas_price, gas_limit, to, value, data, v, r, s
+    _nonce, _gas_price, _gas_limit, _to, _value, _data, _v, _r, _s
   ], << encoded_private_key :: binary-size(64) >>) do
     decoded_private_key = Base.decode16!(encoded_private_key, case: :mixed)
     to_signed_transaction_list(transaction_list, decoded_private_key)
   end
 
   defp to_signed_transaction_list(transaction_list = [
-    nonce, gas_price, gas_limit, to, value, data, v, r, s
-  ], << private_key :: binary-size(32) >>) do # NOTE: this part is problematic
+    nonce, gas_price, gas_limit, to, value, data, v, _r, _s
+  ], << private_key :: binary-size(32) >>) do
     chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
     message_hash = hash_transaction_list(transaction_list, false)
 

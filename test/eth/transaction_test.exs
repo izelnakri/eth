@@ -3,9 +3,6 @@ defmodule ETH.TransactionTest do
   use ExUnit.Case
   import ETH.Utils
 
-  @first_example_wallet %{
-    private_key: "e331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109"
-  }
   @first_example_transaction %{
     nonce: "0x00",
     gas_price: "0x09184e72a000",
@@ -27,7 +24,7 @@ defmodule ETH.TransactionTest do
 
       transaction_list
       |> Stream.with_index
-      |> Enum.each(fn({value, index}) ->
+      |> Enum.each(fn({_value, index}) ->
         encoded_buffer = Enum.at(transaction_list, index) |> Base.encode16(case: :lower)
         assert Enum.at(transaction, index) == "0x#{encoded_buffer}"
       end)
@@ -84,7 +81,7 @@ defmodule ETH.TransactionTest do
   end
 
   test "get_sender_address/1 works" do
-    transactons = @transactions
+    @transactions
     |> Enum.slice(0..2)
     |> Enum.each(fn(transaction) ->
       transaction_list = transaction |> Map.get("raw") |> ETH.Transaction.parse |> ETH.Transaction.to_list
@@ -95,7 +92,7 @@ defmodule ETH.TransactionTest do
   end
 
   test "sign/2 works" do
-    transactons = @transactions
+    @transactions
     |> Enum.slice(0..2)
     |> Enum.each(fn(transaction) ->
       signed_transaction_list = transaction
@@ -120,8 +117,6 @@ defmodule ETH.TransactionTest do
   end
 
   test "send_transaction_works" do
-    client_accounts = ETH.Query.get_accounts
-
     output = ETH.Transaction.set(%{
       nonce: 1, to: "0x0dcd857b3c5db88cb7c025f0ef229331cfadffe5", value: 22, gas_limit: 100000,
       gas_price: 1000, from: "0x42c343d8b77a9106d7112b71ba6b3030a34ba560"

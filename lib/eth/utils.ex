@@ -33,9 +33,8 @@ defmodule ETH.Utils do
     "0x#{Base.encode16(eth_address)}"
   end
 
-  # NOTE: not tested area:
-  def convert(number, magnitute \\ :ether) do
-    denomination = [
+  def convert(number, denomination \\ :ether) do # NOTE: not tested area:
+    denom = [
       wei:     1,
       kwei:    1000,
       mwei:    1000000,
@@ -47,9 +46,9 @@ defmodule ETH.Utils do
       finney:  1000000000000000,
       milli:   1000000000000000,
       ether:   1000000000000000000,
-    ] |> List.keyfind(magnitute, 0) |> elem(1)
+    ] |> List.keyfind(denomination, 0) |> elem(1)
 
-    number / denomination
+    number / denom
   end
 
   def secp256k1_signature(hash, private_key) do
@@ -86,10 +85,6 @@ defmodule ETH.Utils do
     number
   end
 
-  defp buffer_to_json_value(data) do
-    "0x" <> Base.encode16(data, case: :mixed)
-  end
-
   def pad_to_even(data) do
     if rem(String.length(data), 2) == 1, do: "0#{data}", else: data
   end
@@ -98,6 +93,7 @@ defmodule ETH.Utils do
     computed_chain_id = compute_chain_id(v)
     if computed_chain_id == 0, do: (chain_id || 0), else: computed_chain_id
   end
+
   defp compute_chain_id("0x" <> v) do
     sig_v = buffer_to_int(v)
     chain_id = Float.floor((sig_v - 35) / 2)
@@ -108,6 +104,10 @@ defmodule ETH.Utils do
     chain_id = Float.floor((sig_v - 35) / 2)
     if chain_id < 0, do: 0, else: Kernel.trunc(chain_id)
   end
+
+  # defp buffer_to_json_value(buffer) do
+  #   "0x" <> Base.encode16(buffer, case: :mixed)
+  # end
 end
 
 # NOTE: old version that is error-prone:
