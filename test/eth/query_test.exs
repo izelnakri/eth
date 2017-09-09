@@ -24,7 +24,7 @@ defmodule ETH.QueryTest do
   end
 
   test "get_balance/1 returns the balance of an ethereum address in ether by default" do
-    address_with_balance = ETH.Query.get_accounts |> List.first
+    address_with_balance = ETH.Query.get_accounts |> List.last
     address_with_no_balance = ETH.Wallet.create |> Map.get(:eth_address)
 
     assert ETH.Query.get_balance(address_with_balance) == 100.0
@@ -32,7 +32,7 @@ defmodule ETH.QueryTest do
   end
 
   test "balance/1 returns the balance of an ethereum address with specific denomination" do
-    address_with_balance = ETH.Query.get_accounts |> List.first
+    address_with_balance = ETH.Query.get_accounts |> List.last
     address_with_no_balance = ETH.Wallet.create |> Map.get(:eth_address)
 
     assert ETH.Query.get_balance(address_with_balance, :wei) == 1.0e20
@@ -40,13 +40,13 @@ defmodule ETH.QueryTest do
   end
 
   test "transaction_count/1 works" do
-    address_with_balance = ETH.Query.get_accounts |> List.first
+    address_with_balance = ETH.Query.get_accounts |> List.last
 
     assert ETH.Query.get_transaction_count(address_with_balance) == 0
   end
 
   test "estimate_gas/2 works with default wei denomination" do
-    address_with_balance = ETH.Query.get_accounts |> List.first
+    address_with_balance = ETH.Query.get_accounts |> List.last
 
     assert ETH.Query.estimate_gas(%{to: address_with_balance, data: ""}) == 2.1e4
     assert ETH.Query.estimate_gas(%{to: address_with_balance, data: "asd"}) == 21340

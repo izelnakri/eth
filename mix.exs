@@ -26,7 +26,6 @@ defmodule Eth.Mixfile do
       {:libsecp256k1, [github: "mbrix/libsecp256k1", manager: :rebar]},
       {:keccakf1600, git: "https://github.com/jur0/erlang-keccakf1600", branch: "original-keccak"},
       {:ex_rlp, "~> 0.2.1"},
-      {:hex_prefix, "~> 0.1.0"},
       {:hexate, "~> 0.6.1"},
       {:ethereumex, "~> 0.1.0"},
       {:poison, "~> 3.1"},

@@ -17,16 +17,6 @@ defmodule ETH.Transaction.Signer do
     |> hash_transaction_list(include_signature)
   end
 
-  # def hash_transaction(transaction=%{}, include_signature) do # TODO: check if this is necessary
-  #   chain_id = get_chain_id(Map.get(transaction, :v, <<28>>), Map.get(transaction, :chain_id))
-  #
-  #   transaction
-  #   |> Map.delete(:chain_id)
-  #   |> TransactionParser.to_list
-  #   |> List.insert_at(-1, chain_id)
-  #   |> hash_transaction_list(include_signature)
-  # end
-
   def hash_transaction_list(
     transaction_list, include_signature \\ true
   ) when is_list(transaction_list) do # NOTE: usage is generally internal

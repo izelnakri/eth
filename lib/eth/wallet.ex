@@ -16,4 +16,6 @@ defmodule ETH.Wallet do
     %{private_key: Base.encode16(private_key), public_key: Base.encode16(public_key),
       eth_address: eth_address}
   end
+
+  def parse(private_key), do: create(private_key)
 end

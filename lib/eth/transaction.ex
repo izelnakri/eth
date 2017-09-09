@@ -1,16 +1,17 @@
-require IEx
 defmodule ETH.Transaction do
   import ETH.Utils
 
   alias ETH.Query
 
+  defdelegate set(params), to: ETH.Transaction.Setter
+  defdelegate set(wallet, params), to: ETH.Transaction.Setter
+  defdelegate set(sender_wallet, receiver_wallet, params), to: ETH.Transaction.Setter
   defdelegate parse(data), to: ETH.Transaction.Parser # NOTE: improve this one
   defdelegate to_list(data), to: ETH.Transaction.Parser
   defdelegate hash_transaction(transaction), to: ETH.Transaction.Signer
   defdelegate hash_transaction(transaction, include_signature), to: ETH.Transaction.Signer
   defdelegate hash_transaction_list(transaction_list), to: ETH.Transaction.Signer
   defdelegate hash_transaction_list(transaction_list, include_signature), to: ETH.Transaction.Signer
-  # TODO: allow ETH.Transaction.Wallet for signing
   defdelegate sign_transaction(transaction, private_key), to: ETH.Transaction.Signer
   defdelegate sign_transaction_list(transaction_list, private_key), to: ETH.Transaction.Signer
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
@@ -24,55 +25,58 @@ defmodule ETH.Transaction do
     ETH.Transaction.Signer.hash_transaction(transaction, include_signature)
   end
 
-  # TODO: what if its a wallet
-  def set(params) when is_list(params) do
-    gas_price = Keyword.get(params, :gas_price, ETH.Query.gas_price())
-    data = Keyword.get(params, :data, "")
-    nonce = Keyword.get(params, :nonce, ETH.Query.get_transaction_count(params[:from]))
-    chain_id = Keyword.get(params, :chain_id, 3)
-    gas_limit = Keyword.get(params, :gas_limit, ETH.Query.estimate_gas(%{
-      to: params[:to], value: params[:value], data: data, nonce: nonce, chain_id: chain_id
-    }))
-    # gas_limit = 100000000
-
-    %{
-      nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: params[:to],
-      value: params[:value], data: params[:data]
-    }
-    |> parse
+  def send_transaction(wallet, params) when is_map(params) do
+    params
+    |> Map.merge(%{from: wallet.eth_address})
+    |> to_transaction(wallet.private_key)
   end
-  def set(params) do
-    gas_price = Map.get(params, :gas_price, ETH.Query.gas_price())
-    data = Map.get(params, :data, "")
-    nonce = Map.get(params, :nonce, ETH.Query.get_transaction_count(params.from))
-    chain_id = Map.get(params, :chain_id, 3)
-    gas_limit = Map.get(params, :gas_limit, ETH.Query.estimate_gas(%{
-      to: params.to, value: params.value, data: data, nonce: nonce, chain_id: chain_id
-    }))
-    # gas_limit = 100000000
-
-    %{nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: params.to, value: params.value, data: data}
-    |> parse
-  end
-
   def send_transaction(params, private_key) when is_list(params) do
     params
-    |> set
-    |> sign_transaction(private_key)
-    # |> send
+    |> to_transaction(private_key)
   end
-  # TODO: what if its a wallet
-  def send_transaction(params, private_key) do
+  def send_transaction(params, private_key) when is_map(params) do
     params
-    |> set
-    |> sign_transaction(private_key)
-    # |> send
+    |> to_transaction(private_key)
+  end
+  def send_transaction(sender_wallet, receiver_wallet, value) when is_number(value) do
+    %{from: sender_wallet.eth_address, to: receiver_wallet.eth_address, value: value}
+    |> to_transaction(sender_wallet.private_key)
+  end
+  def send_transaction(sender_wallet, receiver_wallet, params) when is_map(params) do
+    params
+    |> Map.merge(%{from: sender_wallet.eth_address, to: receiver_wallet.eth_address})
+    |> to_transaction(sender_wallet.private_key)
+  end
+  def send_transaction(sender_wallet, receiver_wallet, params) when is_list(params) do
+    params
+    |> Keyword.merge([from: sender_wallet.eth_address, to: receiver_wallet.eth_address])
+    |> to_transaction(sender_wallet.private_key)
+  end
+  def send_transaction(sender_wallet, receiver_wallet, value, private_key) when is_number(value) do
+    %{from: sender_wallet.eth_address, to: receiver_wallet.eth_address, value: value}
+    |> to_transaction(private_key)
+  end
+  def send_transaction(sender_wallet, receiver_wallet, params, private_key) when is_map(params) do
+    params
+    |> Map.merge(%{from: sender_wallet.eth_address, to: receiver_wallet.eth_address})
+    |> to_transaction(private_key)
+  end
+  def send_transaction(sender_wallet, receiver_wallet, params, private_key) when is_list(params) do
+    params
+    |> Keyword.merge([from: sender_wallet.eth_address, to: receiver_wallet.eth_address])
+    |> to_transaction(private_key)
   end
 
   def send(signature), do: Ethereumex.HttpClient.eth_send_raw_transaction([signature])
 
   def get_senders_public_key("0x" <> rlp_encoded_transaction_list) do # NOTE: not tested
     rlp_encoded_transaction_list
+    |> ExRLP.decode
+    |> to_senders_public_key
+  end
+  def get_senders_public_key(<<encoded_tx>>) do
+    encoded_tx
+    |> Base.decode(case: :mixed)
     |> ExRLP.decode
     |> to_senders_public_key
   end
@@ -84,6 +88,13 @@ defmodule ETH.Transaction do
     rlp_encoded_transaction_list
     |> ExRLP.decode
     |> get_senders_public_key
+    |> get_address
+  end
+  def get_sender_address(<<encoded_tx>>) do
+    encoded_tx
+    |> Base.decode(case: :mixed)
+    |> ExRLP.decode
+    |> to_senders_public_key
     |> get_address
   end
   def get_sender_address(transaction_list = [
@@ -103,5 +114,18 @@ defmodule ETH.Transaction do
 
     {:ok, public_key} = :libsecp256k1.ecdsa_recover_compact(message_hash, signature, :uncompressed, recovery_id)
     public_key
+  end
+
+  defp to_transaction(params, private_key) do
+    result = params
+      |> set
+      |> sign_transaction(private_key)
+      |> Base.encode16
+      |> send
+
+    case result do
+      {:ok, transaction_details} -> transaction_details["result"]
+      _ -> result
+    end
   end
 end

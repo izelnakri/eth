@@ -16,7 +16,18 @@ defmodule ETH.Query do
     |> get_result
   end
 
-  def get_balance(eth_address, denomination \\ :ether) do
+  def call(call_params) do
+    Ethereumex.HttpClient.eth_call([call_params])
+    |> get_result
+  end
+
+  def get_balance(param, denomination \\ :ether)
+  def get_balance(wallet, denomination) when is_map(wallet) do
+    Ethereumex.HttpClient.eth_get_balance([wallet.eth_address])
+    |> get_number_result
+    |> convert(denomination)
+  end
+  def get_balance(eth_address, denomination) do
     Ethereumex.HttpClient.eth_get_balance([eth_address])
     |> get_number_result
     |> convert(denomination)
@@ -63,6 +74,10 @@ defmodule ETH.Query do
     end)
   end
 
+  def get_transaction_count(wallet) when is_map(wallet) do
+    Ethereumex.HttpClient.eth_get_transaction_count([wallet.eth_address])
+    |> get_number_result
+  end
   def get_transaction_count(eth_address) do
     Ethereumex.HttpClient.eth_get_transaction_count([eth_address])
     |> get_number_result
