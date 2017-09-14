@@ -21,6 +21,10 @@ defmodule ETH do
   defdelegate get_accounts, to: ETH.Query
   defdelegate gas_price, to: ETH.Query
   defdelegate call(call_params), to: ETH.Query
+  defdelegate get_block(identifier), to: ETH.Query
+  defdelegate get_block_transactions(identifier), to: ETH.Query
+  defdelegate get_block_transaction_count(identifier), to: ETH.Query
+  defdelegate get_transaction_from_block(identifier, index), to: ETH.Query
   defdelegate get_balance(wallet_or_address, denomination), to: ETH.Query
   defdelegate get_transaction(transaction_hash), to: ETH.Query
   defdelegate get_transaction_receipt(transaction_hash), to: ETH.Query

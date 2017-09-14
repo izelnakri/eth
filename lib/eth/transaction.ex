@@ -30,7 +30,7 @@ defmodule ETH.Transaction do
     |> Map.merge(%{from: wallet.eth_address})
     |> to_transaction(wallet.private_key)
   end
-  def send_transaction(params, private_key) when is_list(params) do
+  def send_transaction(params, private_key) when is_list(params) do # NOTE: check params.from
     params
     |> to_transaction(private_key)
   end
@@ -117,7 +117,8 @@ defmodule ETH.Transaction do
   end
 
   defp to_transaction(params, private_key) do
-    result = params
+    target_params = set_default_from(params, private_key)
+    result = target_params
       |> set
       |> sign_transaction(private_key)
       |> Base.encode16
@@ -127,5 +128,12 @@ defmodule ETH.Transaction do
       {:ok, transaction_details} -> transaction_details["result"]
       _ -> result
     end
+  end
+
+  defp set_default_from(params, private_key) when is_list(params) do
+    Keyword.get(params, :from, get_address(private_key))
+  end
+  defp set_default_from(params, private_key) when is_map(params) do
+    Map.get(params, :from, get_address(private_key))
   end
 end

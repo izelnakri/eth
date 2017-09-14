@@ -1,6 +1,6 @@
+- mnemonic and ICAP support
 - check ethUtils.hashPersonalMessage
 - maybe ICAP check toChecksumAddress + isValidChecksumAddress
-- maybe fromRPCtoSig, toRPCSig
 
 
 describe('message sig', function () {
