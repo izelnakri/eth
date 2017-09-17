@@ -16,7 +16,7 @@ defmodule Eth.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :ethereumex]
     ]
   end
 
@@ -24,10 +24,10 @@ defmodule Eth.Mixfile do
   defp deps do
     [
       {:libsecp256k1, [github: "mbrix/libsecp256k1", manager: :rebar]},
-      {:keccakf1600, git: "https://github.com/jur0/erlang-keccakf1600", branch: "original-keccak"},
+      {:keccakf1600, "~> 2.0", hex: :keccakf1600_orig},
       {:ex_rlp, "~> 0.2.1"},
       {:hexate, "~> 0.6.1"},
-      {:ethereumex, "~> 0.1.0"},
+      {:ethereumex, "~> 0.1.1"},
       {:poison, "~> 3.1"},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
