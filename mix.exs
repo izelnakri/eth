@@ -4,7 +4,7 @@ defmodule Eth.Mixfile do
   def project do
     [
       app: :eth,
-      version: "0.1.0",
+      version: "0.2.2",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
@@ -23,13 +23,14 @@ defmodule Eth.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:libsecp256k1, [github: "mbrix/libsecp256k1", manager: :rebar]},
-      {:keccakf1600, "~> 2.0", hex: :keccakf1600_orig},
-      {:ex_rlp, "~> 0.2.1"},
-      {:hexate, "~> 0.6.1"},
       {:ethereumex, "~> 0.1.1"},
+      {:ex_rlp, "~> 0.2.1"},
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:hexate, "~> 0.6.1"},
+      {:keccakf1600, "~> 2.0", hex: :keccakf1600_orig},
+      {:mnemonic, "~> 0.2.0"},
       {:poison, "~> 3.1"},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:libsecp256k1, "~> 0.1.3"}
     ]
   end
 

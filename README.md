@@ -1,7 +1,7 @@
 [![Hex Version](http://img.shields.io/hexpm/v/eth.svg?style=flat)](https://hex.pm/packages/eth) [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/eth/ETH.html)
 
 # ETH
-The essential Elixir library for interacting with Ethereum blockchain. You can now query the blockchain, create Ethereum wallets and sign/send transactions, all from Elixir / Erlang Virtual Machine.
+The essential Elixir library for interacting with Ethereum blockchain. You can now create Ethereum wallets, query the blockchain and sign/send transactions, all from Elixir / Erlang Virtual Machine.
 
 ## Example
 
@@ -58,7 +58,7 @@ Warning: This library uses the Ethereum JSON-RPC under the hood, so you need an 
 
 ### Credits
 
-- [Izel Nakri](https://github.com/izelnakri) - Spent and continues to spend too much time and mental energy to build this library. I reverse engineered ethereum JavaScript libraries in Elixir so you don't have to.
+- [Izel Nakri](https://github.com/izelnakri) - I reverse engineered ethereum JavaScript libraries in Elixir so you don't have to.
 
 Additionally this library wouldnt exists without the libraries below:
 - ExRLP
