@@ -1,15 +1,16 @@
 defmodule ETH do
   @moduledoc """
-  Documentation for Eth.
+  Elixir module that provides Ethereum utility functions
   """
 
   @doc """
-  Hello world.
+  In order to use most of the functions in this library you need to be connected to an ethereum node.
+  This could be your own self-hosted node running locally or a public proxy.
 
   ## Examples
 
-      iex> Eth.hello
-      :world
+      iex> ETH.block_number
+      46080211
 
   """
   Application.put_env(:ethereumex, :scheme, Application.get_env(:eth, :scheme, "http"))
@@ -17,19 +18,38 @@ defmodule ETH do
   Application.put_env(:ethereumex, :port, Application.get_env(:eth, :port, 8545))
 
   defdelegate block_number, to: ETH.Query
+  defdelegate block_number!, to: ETH.Query
   defdelegate syncing, to: ETH.Query
+  defdelegate syncing!, to: ETH.Query
   defdelegate get_accounts, to: ETH.Query
+  defdelegate get_accounts!, to: ETH.Query
   defdelegate gas_price, to: ETH.Query
+  defdelegate gas_price!, to: ETH.Query
   defdelegate call(call_params), to: ETH.Query
+  defdelegate call!(call_params), to: ETH.Query
+  defdelegate get_block, to: ETH.Query
   defdelegate get_block(identifier), to: ETH.Query
-  defdelegate get_block_transactions(identifier), to: ETH.Query
-  defdelegate get_block_transaction_count(identifier), to: ETH.Query
-  defdelegate get_transaction_from_block(identifier, index), to: ETH.Query
+  defdelegate get_block!, to: ETH.Query
+  defdelegate get_block!(identifier), to: ETH.Query
+  defdelegate get_balance(wallet_or_address), to: ETH.Query
   defdelegate get_balance(wallet_or_address, denomination), to: ETH.Query
-  defdelegate get_transaction(transaction_hash), to: ETH.Query
-  defdelegate get_transaction_receipt(transaction_hash), to: ETH.Query
-  defdelegate get_transaction_count(wallet_or_address), to: ETH.Query
+  defdelegate get_balance!(wallet_or_address), to: ETH.Query
+  defdelegate get_balance!(wallet_or_address, denomination), to: ETH.Query
   defdelegate estimate_gas(transaction), to: ETH.Query
+  defdelegate estimate_gas!(transaction), to: ETH.Query
+  defdelegate estimate_gas(transaction, denomination), to: ETH.Query
+  defdelegate estimate_gas!(transaction, denomination), to: ETH.Query
+
+  defdelegate get_block_transactions(identifier), to: ETH.TransactionQueries
+  defdelegate get_block_transactions!(identifier), to: ETH.TransactionQueries
+  defdelegate get_block_transaction_count(identifier), to: ETH.TransactionQueries
+  defdelegate get_block_transaction_count!(identifier), to: ETH.TransactionQueries
+  defdelegate get_transaction_from_block(identifier, index), to: ETH.TransactionQueries
+  defdelegate get_transaction_from_block!(identifier, index), to: ETH.TransactionQueries
+  defdelegate get_transaction(transaction_hash), to: ETH.TransactionQueries
+  defdelegate get_transaction_receipt(transaction_hash), to: ETH.TransactionQueries
+  defdelegate get_transaction_count(wallet_or_address), to: ETH.TransactionQueries
+  defdelegate get_transaction_count!(wallet_or_address), to: ETH.TransactionQueries
 
   defdelegate parse(data), to: ETH.Transaction.Parser
   defdelegate to_list(data), to: ETH.Transaction.Parser
@@ -41,7 +61,10 @@ defmodule ETH do
   defdelegate hash_transaction(transaction), to: ETH.Transaction.Signer
   defdelegate hash_transaction(transaction, include_signature), to: ETH.Transaction.Signer
   defdelegate hash_transaction_list(transaction_list), to: ETH.Transaction.Signer
-  defdelegate hash_transaction_list(transaction_list, include_signature), to: ETH.Transaction.Signer
+
+  defdelegate hash_transaction_list(transaction_list, include_signature),
+    to: ETH.Transaction.Signer
+
   defdelegate sign_transaction(transaction, private_key), to: ETH.Transaction.Signer
   defdelegate sign_transaction_list(transaction_list, private_key), to: ETH.Transaction.Signer
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
@@ -49,8 +72,13 @@ defmodule ETH do
 
   defdelegate hash(transaction, include_signature), to: ETH.Transaction
   defdelegate send_transaction(params_or_wallet, private_key_or_params), to: ETH.Transaction
-  defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params), to: ETH.Transaction
-  defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params, private_key), to: ETH.Transaction
+
+  defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params),
+    to: ETH.Transaction
+
+  defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params, private_key),
+    to: ETH.Transaction
+
   defdelegate send(signature), to: ETH.Transaction
   defdelegate get_senders_public_key(transaction_input), to: ETH.Transaction
   defdelegate get_sender_address(transaction_input), to: ETH.Transaction

@@ -6,7 +6,7 @@ defmodule Eth.Mixfile do
       app: :eth,
       version: "0.2.2",
       elixir: "~> 1.5",
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
       description: description()
@@ -23,21 +23,22 @@ defmodule Eth.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ethereumex, "~> 0.1.1"},
+      {:ethereumex, "~> 0.2.1"},
       {:ex_rlp, "~> 0.2.1"},
       {:ex_doc, ">= 0.0.0", only: :dev},
+      {:dialyxir, "~> 0.5.1", only: [:dev], runtime: false},
       {:hexate, "~> 0.6.1"},
       {:keccakf1600, "~> 2.0", hex: :keccakf1600_orig},
-      {:mnemonic, "~> 0.2.0"},
+      {:mnemonic, "~> 0.2.1"},
       {:poison, "~> 3.1"},
       {:libsecp256k1, "~> 0.1.3"}
     ]
   end
 
   defp description do
-     """
-     Ethereum utilities for Elixir.
-     """
+    """
+    Ethereum utilities for Elixir.
+    """
   end
 
   def package do
