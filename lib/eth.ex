@@ -13,9 +13,7 @@ defmodule ETH do
       46080211
 
   """
-  Application.put_env(:ethereumex, :scheme, Application.get_env(:eth, :scheme, "http"))
-  Application.put_env(:ethereumex, :host, Application.get_env(:eth, :host, "localhost"))
-  Application.put_env(:ethereumex, :port, Application.get_env(:eth, :port, 8545))
+  Application.put_env(:ethereumex, :url, Application.get_env(:eth, :url, "http://localhost:8545"))
 
   defdelegate block_number, to: ETH.Query
   defdelegate block_number!, to: ETH.Query

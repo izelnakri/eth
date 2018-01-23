@@ -4,8 +4,8 @@ defmodule Eth.Mixfile do
   def project do
     [
       app: :eth,
-      version: "0.3.1",
-      elixir: "~> 1.5",
+      version: "0.3.2",
+      elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
@@ -23,7 +23,7 @@ defmodule Eth.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ethereumex, "~> 0.2.1"},
+      {:ethereumex, "~> 0.3.0"},
       {:ex_rlp, "~> 0.2.1"},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:dialyxir, "~> 0.5.1", only: [:dev], runtime: false},

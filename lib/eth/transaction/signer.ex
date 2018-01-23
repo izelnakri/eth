@@ -73,7 +73,8 @@ defmodule ETH.Transaction.Signer do
           _s
         ],
         <<private_key::binary-size(32)>>
-      ) when is_map(transaction_list) do
+      )
+      when is_map(transaction_list) do
     sign_transaction_list(transaction_list, private_key)
   end
 
@@ -90,7 +91,8 @@ defmodule ETH.Transaction.Signer do
           _s
         ],
         <<encoded_private_key::binary-size(64)>>
-      ) when is_list(transaction_list) do
+      )
+      when is_list(transaction_list) do
     decoded_private_key = Base.decode16!(encoded_private_key, case: :mixed)
     sign_transaction_list(transaction_list, decoded_private_key)
   end
