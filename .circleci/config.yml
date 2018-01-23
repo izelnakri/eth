@@ -27,7 +27,7 @@ jobs:
             echo 'nvm install v7.10.1' >> $BASH_ENV
             echo 'nvm alias default 7.10.1' >> $BASH_ENV
       - run: node -v
-      - run: npm install -g testrpc
+      - run: npm install -g ganache-cli
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get

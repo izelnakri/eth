@@ -1,3 +1,5 @@
+require IEx
+
 defmodule ETH.Transaction.Signer.Test do
   use ExUnit.Case
   import ETH.Utils
@@ -15,17 +17,45 @@ defmodule ETH.Transaction.Signer.Test do
     # EIP 155 chainId - mainnet: 1, ropsten: 3
     chain_id: 3
   }
+  @encoded_example_private_key "75c3b11e480f8ba3db792424bebda1fc8dea2b254287e3a9af9ed50c7d255720"
+  @decoded_example_private_key Base.decode16!("75c3b11e480f8ba3db792424bebda1fc8dea2b254287e3a9af9ed50c7d255720", case: :mixed)
 
-  # TODO: rewrite the tests below
+  setup_all do
+    ETH.TestClient.start
+
+    on_exit fn ->
+      ETH.TestClient.stop
+    end
+
+    :ok
+  end
 
   test "hash/2 works" do
     target_hash = "DF2A7CB6D05278504959987A144C116DBD11CBDC50D6482C5BAE84A7F41E2113"
 
+    assert Transaction.hash(@first_example_transaction, false) |> Base.encode16() == target_hash
     assert @first_example_transaction
            |> Transaction.to_list()
            |> List.insert_at(-1, @first_example_transaction.chain_id)
            |> Transaction.hash(false)
            |> Base.encode16() == target_hash
+
+    next_target_hash = "B89EE1E3B4FF893AC8C435BE40EA94A1BA0EB3F64B48382DA967780BAFC8DBB1"
+
+    assert Transaction.hash(@first_example_transaction) |> Base.encode16() == next_target_hash
+    assert @first_example_transaction
+           |> Transaction.to_list()
+           |> List.insert_at(-1, @first_example_transaction.chain_id)
+           |> Transaction.hash()
+           |> Base.encode16() == next_target_hash
+
+    assert Transaction.hash(@first_example_transaction, true) |> Base.encode16() == next_target_hash
+    assert @first_example_transaction
+          |> Transaction.to_list()
+          |> List.insert_at(-1, @first_example_transaction.chain_id)
+          |> Transaction.hash(true)
+          |> Base.encode16() == next_target_hash
+
 
     first_transaction_list =
       @transactions
@@ -60,28 +90,82 @@ defmodule ETH.Transaction.Signer.Test do
              decode16("f97c73fdca079da7652dbc61a46cd5aeef804008e057be3e712c43eac389aaf0")
   end
 
-  test "hash_transaction/2 works" do
-    result =
-      @first_example_transaction
-      |> Transaction.hash(false)
+  test "sign_transaction works for transaction maps with encoded private keys" do
+    output =
+      Transaction.build(%{
+        nonce: 1,
+        to: "0x0dcd857b3c5db88cb7c025f0ef229331cfadffe5",
+        value: 22,
+        gas_limit: 100_000,
+        gas_price: 1000,
+        from: "0x42c343d8b77a9106d7112b71ba6b3030a34ba560"
+      })
+      |> Transaction.sign_transaction(@encoded_example_private_key)
       |> Base.encode16(case: :lower)
 
-    assert result == "df2a7cb6d05278504959987a144c116dbd11cbdc50d6482c5bae84a7f41e2113"
+    serialized_hash =
+      "f862018203e8830186a0940dcd857b3c5db88cb7c025f0ef229331cfadffe516801ba09b35467cf48151683b41ed8425d59317716f4f639126d7eb69167ac95c8c3ba3a00d5d21f4c6fc400202dadc09a192b011cc16aefa6155d4e5df15d77d9f6c8f9f"
+
+    assert output == serialized_hash
   end
 
-  test "sign_transaction/2 works" do
-    @transactions
-    |> Enum.slice(0..2)
-    |> Enum.each(fn transaction ->
-      signed_transaction_list =
-        transaction
-        |> Map.get("raw")
-        |> Transaction.parse()
-        |> Transaction.to_list()
-        |> Transaction.sign_transaction(transaction["privateKey"])
+  test "sign_transaction works for transaction maps with decoded private keys" do
+    output =
+      Transaction.build(%{
+        nonce: 1,
+        to: "0x0dcd857b3c5db88cb7c025f0ef229331cfadffe5",
+        value: 22,
+        gas_limit: 100_000,
+        gas_price: 1000,
+        from: "0x42c343d8b77a9106d7112b71ba6b3030a34ba560"
+      })
+      |> Transaction.sign_transaction(@decoded_example_private_key)
+      |> Base.encode16(case: :lower)
 
-      result = Transaction.get_sender_address(signed_transaction_list)
-      assert result == "0x" <> String.upcase(transaction["sendersAddress"])
-    end)
+    serialized_hash =
+      "f862018203e8830186a0940dcd857b3c5db88cb7c025f0ef229331cfadffe516801ba09b35467cf48151683b41ed8425d59317716f4f639126d7eb69167ac95c8c3ba3a00d5d21f4c6fc400202dadc09a192b011cc16aefa6155d4e5df15d77d9f6c8f9f"
+
+    assert output == serialized_hash
   end
+
+  # TODO: should I add ExRLP.encode() to sign_transaction(transaction_lists) it also changes the test results of above
+  # test "sign_transaction works for transaction lists with encoded private keys" do
+  #   output =
+  #     Transaction.build(%{
+  #       nonce: 1,
+  #       to: "0x0dcd857b3c5db88cb7c025f0ef229331cfadffe5",
+  #       value: 22,
+  #       gas_limit: 100_000,
+  #       gas_price: 1000,
+  #       from: "0x42c343d8b77a9106d7112b71ba6b3030a34ba560"
+  #     })
+  #     |> Transaction.to_list()
+  #     |> Transaction.sign_transaction(@encoded_example_private_key)
+  #     |> Base.encode16(case: :lower)
+  #
+  #   serialized_hash =
+  #     "f862018203e8830186a0940dcd857b3c5db88cb7c025f0ef229331cfadffe516801ba09b35467cf48151683b41ed8425d59317716f4f639126d7eb69167ac95c8c3ba3a00d5d21f4c6fc400202dadc09a192b011cc16aefa6155d4e5df15d77d9f6c8f9f"
+  #
+  #   assert output == serialized_hash
+  # end
+  #
+  # test "sign_transaction works for transaction lists with decoded private keys" do
+  #   output =
+  #     Transaction.build(%{
+  #       nonce: 1,
+  #       to: "0x0dcd857b3c5db88cb7c025f0ef229331cfadffe5",
+  #       value: 22,
+  #       gas_limit: 100_000,
+  #       gas_price: 1000,
+  #       from: "0x42c343d8b77a9106d7112b71ba6b3030a34ba560"
+  #     })
+  #     |> Transaction.to_list()
+  #     |> Transaction.sign_transaction(@decoded_example_private_key)
+  #     |> Base.encode16(case: :lower)
+  #
+  #   serialized_hash =
+  #     "f862018203e8830186a0940dcd857b3c5db88cb7c025f0ef229331cfadffe516801ba09b35467cf48151683b41ed8425d59317716f4f639126d7eb69167ac95c8c3ba3a00d5d21f4c6fc400202dadc09a192b011cc16aefa6155d4e5df15d77d9f6c8f9f"
+  #
+  #   assert output == serialized_hash
+  # end
 end

@@ -91,36 +91,16 @@ defmodule ETH.TransactionQueries do
   end
 
   def get_transaction_receipt(transaction_hash) do
-    HttpClient.eth_get_transaction_receipt([transaction_hash])
-    |> Enum.reduce(%{}, fn tuple, acc ->
-      {key, value} = tuple
+    case HttpClient.eth_get_transaction_receipt(transaction_hash) do
+      {:ok, raw_transaction_receipt} ->
+        {:ok, convert_transaction_receipt(raw_transaction_receipt)}
+      error -> error
+    end
+  end
 
-      case key do
-        "transactionIndex" ->
-          Map.put(acc, :transaction_index, convert_to_number(value))
-
-        "blockNumber" ->
-          Map.put(acc, :block_number, convert_to_number(value))
-
-        "cumulativeGasUsed" ->
-          Map.put(acc, :cumulative_gas_used, convert_to_number(value))
-
-        "gasUsed" ->
-          Map.put(acc, :gas_used, convert_to_number(value))
-
-        "logs" ->
-          Map.put(
-            acc,
-            :logs,
-            Enum.map(value, fn log ->
-              convert_transaction_log(log)
-            end)
-          )
-
-        _ ->
-          Map.put(acc, key |> Macro.underscore() |> String.to_atom(), value)
-      end
-    end)
+  def get_transaction_receipt!(transaction_hash) do
+    {:ok, raw_transaction_receipt} = HttpClient.eth_get_transaction_receipt(transaction_hash)
+    convert_transaction_receipt(raw_transaction_receipt)
   end
 
   def get_transaction_count(wallet) when is_map(wallet) do
@@ -153,5 +133,37 @@ defmodule ETH.TransactionQueries do
     result
     |> String.slice(2..-1)
     |> Hexate.to_integer()
+  end
+
+  def convert_transaction_receipt(result) do
+    result |> Enum.reduce(%{}, fn tuple, acc ->
+      {key, value} = tuple
+
+      case key do
+        "transactionIndex" ->
+          Map.put(acc, :transaction_index, convert_to_number(value))
+
+        "blockNumber" ->
+          Map.put(acc, :block_number, convert_to_number(value))
+
+        "cumulativeGasUsed" ->
+          Map.put(acc, :cumulative_gas_used, convert_to_number(value))
+
+        "gasUsed" ->
+          Map.put(acc, :gas_used, convert_to_number(value))
+
+        "logs" ->
+          Map.put(
+            acc,
+            :logs,
+            Enum.map(value, fn log ->
+              convert_transaction_log(log)
+            end)
+          )
+
+        _ ->
+          Map.put(acc, key |> Macro.underscore() |> String.to_atom(), value)
+      end
+    end)
   end
 end

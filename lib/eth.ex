@@ -45,7 +45,9 @@ defmodule ETH do
   defdelegate get_transaction_from_block(identifier, index), to: ETH.TransactionQueries
   defdelegate get_transaction_from_block!(identifier, index), to: ETH.TransactionQueries
   defdelegate get_transaction(transaction_hash), to: ETH.TransactionQueries
+  defdelegate get_transaction!(transaction_hash), to: ETH.TransactionQueries
   defdelegate get_transaction_receipt(transaction_hash), to: ETH.TransactionQueries
+  defdelegate get_transaction_receipt!(transaction_hash), to: ETH.TransactionQueries
   defdelegate get_transaction_count(wallet_or_address), to: ETH.TransactionQueries
   defdelegate get_transaction_count!(wallet_or_address), to: ETH.TransactionQueries
 
@@ -72,6 +74,7 @@ defmodule ETH do
     to: ETH.Transaction
 
   defdelegate send(signature), to: ETH.Transaction
+  defdelegate send!(signature), to: ETH.Transaction
   defdelegate get_senders_public_key(transaction_input), to: ETH.Transaction
   defdelegate get_sender_address(transaction_input), to: ETH.Transaction
 

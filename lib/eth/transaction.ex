@@ -1,5 +1,6 @@
 defmodule ETH.Transaction do
   import ETH.Utils
+  alias Ethereumex.HttpClient
 
   defdelegate parse(data), to: ETH.Transaction.Parser
   defdelegate to_list(data), to: ETH.Transaction.Parser
@@ -66,7 +67,11 @@ defmodule ETH.Transaction do
     |> to_transaction(private_key)
   end
 
-  def send(signature), do: Ethereumex.HttpClient.eth_send_raw_transaction([signature])
+  def send(signature), do: HttpClient.eth_send_raw_transaction(signature)
+  def send!(signature) do
+    {:ok, transaction_hash} = HttpClient.eth_send_raw_transaction(signature)
+    transaction_hash
+  end
 
   # NOTE: not tested
   def get_senders_public_key("0x" <> rlp_encoded_transaction_list) do
@@ -158,24 +163,18 @@ defmodule ETH.Transaction do
   defp to_transaction(params, private_key) do
     target_params = set_default_from(params, private_key)
 
-    result =
-      target_params
-      |> build
-      |> sign_transaction(private_key)
-      |> Base.encode16()
-      |> send
-
-    case result do
-      {:ok, transaction_details} -> transaction_details["result"]
-      _ -> result
-    end
+    target_params
+    |> build
+    |> sign_transaction(private_key)
+    |> Base.encode16()
+    |> send
   end
 
   defp set_default_from(params, private_key) when is_list(params) do
-    Keyword.get(params, :from, get_address(private_key))
+    put_in(params, [:from], Keyword.get(params, :from, get_address(private_key)))
   end
 
   defp set_default_from(params, private_key) when is_map(params) do
-    Map.get(params, :from, get_address(private_key))
+    Map.merge(params, %{from: Map.get(params, :from, get_address(private_key))})
   end
 end

@@ -78,7 +78,7 @@ defmodule ETH.Transaction.Signer do
         ],
         <<private_key::binary-size(32)>>
       )
-      when is_map(transaction_list) do
+      when is_list(transaction_list) do
     sign_transaction_list(transaction_list, private_key)
   end
 

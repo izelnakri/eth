@@ -1,4 +1,4 @@
-# NOTE: maybe do HD Wallets + create(mnemonic phrase)
+# NOTE: maybe do HD Wallets + create(mnemonic phrase) + ICAP
 defmodule ETH.Wallet do
   import ETH.Utils
 
