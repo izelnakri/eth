@@ -177,13 +177,11 @@ defmodule ETH.Query do
       {key, value} = tuple
 
       case key do
-        "blockHash" -> Map.put(acc, :block_hash, value)
         "blockNumber" -> Map.put(acc, :block_number, convert_to_number(value))
         "logIndex" -> Map.put(acc, :log_index, convert_to_number(value))
-        "transactionHash" -> Map.put(acc, :transaction_hash, value)
         "transactionIndex" -> Map.put(acc, :transaction_index, convert_to_number(value))
         "transactionLogIndex" -> Map.put(acc, :transaction_log_index, convert_to_number(value))
-        _ -> Map.put(acc, String.to_atom(key), value)
+        _ -> Map.put(acc, key |> Macro.underscore() |> String.to_atom(), value)
       end
     end)
   end
@@ -194,16 +192,12 @@ defmodule ETH.Query do
 
       case key do
         "nonce" -> Map.put(acc, :nonce, convert_to_number(value))
-        "blockHash" -> Map.put(acc, :block_hash, value)
         "blockNumber" -> Map.put(acc, :block_number, convert_to_number(value))
         "transactionIndex" -> Map.put(acc, :transaction_index, convert_to_number(value))
         "value" -> Map.put(acc, :value, convert_to_number(value))
         "gasPrice" -> Map.put(acc, :gas_price, convert_to_number(value))
         "gas" -> Map.put(acc, :gas, convert_to_number(value))
-        "networkId" -> Map.put(acc, :network_id, value)
-        "publicKey" -> Map.put(acc, :public_key, value)
-        "standardV" -> Map.put(acc, :standard_v, value)
-        _ -> Map.put(acc, String.to_atom(key), value)
+        _ -> Map.put(acc, key |> Macro.underscore() |> String.to_atom(), value)
       end
     end)
   end
@@ -217,35 +211,8 @@ defmodule ETH.Query do
         "number" ->
           Map.put(acc, :number, convert_to_number(value))
 
-        "parentHash" ->
-          Map.put(acc, :parent_hash, value)
-
-        "mixHash" ->
-          Map.put(acc, :mix_hash, value)
-
-        "sha3Uncles" ->
-          Map.put(acc, :sha3_uncles, value)
-
-        "logsBloom" ->
-          Map.put(acc, :logs_bloom, value)
-
-        "transactionsRoot" ->
-          Map.put(acc, :transactions_root, value)
-
-        "stateRoot" ->
-          Map.put(acc, :state_root, value)
-
-        "receiptsRoot" ->
-          Map.put(acc, :receipt_root, value)
-
-        "extraData" ->
-          Map.put(acc, :extra_data, value)
-
         "size" ->
           Map.put(acc, :size, convert_to_number(value))
-
-        "sealFields" ->
-          Map.put(acc, :seal_fields, value)
 
         "gasLimit" ->
           Map.put(acc, :gas_limit, convert_to_number(value))
@@ -272,7 +239,7 @@ defmodule ETH.Query do
           )
 
         _ ->
-          Map.put(acc, String.to_atom(key), value)
+          Map.put(acc, key |> Macro.underscore() |> String.to_atom(), value)
       end
     end)
   end
@@ -283,5 +250,3 @@ defmodule ETH.Query do
     |> Hexate.to_integer()
   end
 end
-
-# TODO: use Macro.underscore

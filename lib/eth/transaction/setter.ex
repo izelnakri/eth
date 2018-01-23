@@ -58,16 +58,16 @@ defmodule ETH.Transaction.Setter do
   defp set_params_from_list(params) do
     to = Keyword.get(params, :to, "")
     value = Keyword.get(params, :value, 0)
-    gas_price = Keyword.get(params, :gas_price, ETH.Query.gas_price())
+    gas_price = Keyword.get(params, :gas_price, ETH.gas_price!())
     data = Keyword.get(params, :data, "")
-    nonce = Keyword.get(params, :nonce, ETH.Query.get_transaction_count(params[:from]))
+    nonce = Keyword.get(params, :nonce, ETH.get_transaction_count!(params[:from]))
     chain_id = Keyword.get(params, :chain_id, 3)
 
     gas_limit =
       Keyword.get(
         params,
         :gas_limit,
-        ETH.Query.estimate_gas(%{
+        ETH.estimate_gas!(%{
           to: to,
           value: value,
           data: data,
@@ -82,16 +82,16 @@ defmodule ETH.Transaction.Setter do
   defp set_params_from_map(params) do
     to = Map.get(params, :to, "")
     value = Map.get(params, :value, 0)
-    gas_price = Map.get(params, :gas_price, ETH.Query.gas_price())
+    gas_price = Map.get(params, :gas_price, ETH.gas_price!())
     data = Map.get(params, :data, "")
-    nonce = Map.get(params, :nonce, ETH.Query.get_transaction_count(params.from))
+    nonce = Map.get(params, :nonce, ETH.get_transaction_count!(params.from))
     chain_id = Map.get(params, :chain_id, 3)
 
     gas_limit =
       Map.get(
         params,
         :gas_limit,
-        ETH.Query.estimate_gas(%{
+        ETH.estimate_gas!(%{
           to: to,
           value: value,
           data: data,

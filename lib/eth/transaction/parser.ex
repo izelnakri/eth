@@ -70,26 +70,6 @@ defmodule ETH.Transaction.Parser do
           gas_limit: gas_limit,
           to: to,
           value: value,
-          data: data
-        }
-      ) do
-    %{
-      nonce: to_buffer(nonce),
-      gas_price: to_buffer(gas_price),
-      gas_limit: to_buffer(gas_limit),
-      to: to_buffer(to),
-      value: to_buffer(value),
-      data: to_buffer(data)
-    }
-  end
-
-  def parse(
-        _transaction = %{
-          nonce: nonce,
-          gas_price: gas_price,
-          gas_limit: gas_limit,
-          to: to,
-          value: value,
           data: data,
           v: v,
           r: r,
@@ -106,6 +86,26 @@ defmodule ETH.Transaction.Parser do
       v: to_buffer(v),
       r: to_buffer(r),
       s: to_buffer(s)
+    }
+  end
+
+  def parse(
+        _transaction = %{
+          nonce: nonce,
+          gas_price: gas_price,
+          gas_limit: gas_limit,
+          to: to,
+          value: value,
+          data: data
+        }
+      ) do
+    %{
+      nonce: to_buffer(nonce),
+      gas_price: to_buffer(gas_price),
+      gas_limit: to_buffer(gas_limit),
+      to: to_buffer(to),
+      value: to_buffer(value),
+      data: to_buffer(data)
     }
   end
 

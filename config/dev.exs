@@ -1,3 +1,3 @@
 use Mix.Config
 
-config :ethereumex, scheme: "https", host: "localhost", port: 8545
+config :ethereumex, scheme: "http", host: "localhost", port: 8545

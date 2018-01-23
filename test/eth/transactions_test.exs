@@ -2,8 +2,8 @@
 defmodule ETH.TransactionsTest do
   use ExUnit.Case
 
-  # @transactions File.read!("test/fixtures/transactions.json") |> Poison.decode!
-  # @eip155_transactions File.read!("test/fixtures/eip155_vitalik_tests.json") |> Poison.decode!
+  @transactions File.read!("test/fixtures/transactions.json") |> Poison.decode!()
+  @eip155_transactions File.read!("test/fixtures/eip155_vitalik_tests.json") |> Poison.decode!()
 
   # test "verify signature" do
   #   @transactions |> Enum.each(fn(transaction) ->
@@ -28,9 +28,9 @@ defmodule ETH.TransactionsTest do
   #       decoded_private_key = Base.decode16!(private_key, case: :mixed)
   #       # IO.inspect(decoded_private_key)
   #       transaction_params = ETH.Transaction.decode_transaction_list(Map.get(transaction, "raw"))
-  #       IEx.pry
+  #       # IEx.pry
   #       signature = ETH.Transaction.sign_transaction(transaction_params, decoded_private_key)
-  #       IEx.pry
+  #       # IEx.pry
   #       assert ETH.Transaction.get_sender_address(signature) == senders_address
   #     end
   #   end)

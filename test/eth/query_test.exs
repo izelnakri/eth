@@ -1,4 +1,3 @@
-# TODO: write tests for get_transaction\1 and get_transaction_receipt\1
 # TODO: ETH.call
 defmodule ETH.Query.Test do
   use ExUnit.Case
@@ -79,7 +78,7 @@ defmodule ETH.Query.Test do
              :nonce,
              :number,
              :parent_hash,
-             :receipt_root,
+             :receipts_root,
              :sha3_uncles,
              :size,
              :state_root,
@@ -112,7 +111,7 @@ defmodule ETH.Query.Test do
              :nonce,
              :number,
              :parent_hash,
-             :receipt_root,
+             :receipts_root,
              :sha3_uncles,
              :size,
              :state_root,
@@ -149,7 +148,7 @@ defmodule ETH.Query.Test do
              :nonce,
              :number,
              :parent_hash,
-             :receipt_root,
+             :receipts_root,
              :sha3_uncles,
              :size,
              :state_root,
@@ -180,7 +179,7 @@ defmodule ETH.Query.Test do
              :nonce,
              :number,
              :parent_hash,
-             :receipt_root,
+             :receipts_root,
              :sha3_uncles,
              :size,
              :state_root,
