@@ -26,10 +26,7 @@ defmodule ETH.Query.Test do
   end
 
   test "syncing/0 works" do
-    result = ETH.syncing()
-
-    assert result |> elem(0) == :ok
-    assert result |> elem(1) == false
+    assert ETH.syncing() == {:ok, false}
   end
 
   test "syncing!/0 works" do
@@ -101,8 +98,6 @@ defmodule ETH.Query.Test do
   end
 
   test "get_block/1 by number works" do
-    Process.sleep(2)
-
     target_result = ETH.get_block(2)
     target_block = target_result |> elem(1)
 
@@ -134,7 +129,6 @@ defmodule ETH.Query.Test do
   end
 
   test "get_block/1 by hash works" do
-    Process.sleep(2)
     {:ok, first_block} = ETH.get_block(1)
     {:ok, second_block} = ETH.get_block(2)
 
@@ -171,8 +165,6 @@ defmodule ETH.Query.Test do
   end
 
   test "get_block!/1 by number works" do
-    Process.sleep(2)
-
     target_block = ETH.get_block!(2)
 
     assert target_block.number == 2
@@ -202,7 +194,6 @@ defmodule ETH.Query.Test do
   end
 
   test "get_block!/1 by hash works" do
-    Process.sleep(2)
     first_block = ETH.get_block!(1)
     second_block = ETH.get_block!(2)
 
