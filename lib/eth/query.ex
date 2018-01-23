@@ -154,7 +154,7 @@ defmodule ETH.Query do
   def estimate_gas(transaction = %{to: _to, data: _data}, denomination) do
     case HttpClient.eth_estimate_gas(transaction) do
       {:ok, hex_gas_estimate} ->
-        {:ok, hex_gas_estimate |> convert_to_number |> convert(denomination)}
+        {:ok, hex_gas_estimate |> convert_to_number |> convert(denomination) |> round}
 
       error ->
         error
@@ -166,7 +166,7 @@ defmodule ETH.Query do
   def estimate_gas!(transaction = %{to: _to, data: _data}, denomination) do
     {:ok, hex_gas_estimate} = HttpClient.eth_estimate_gas(transaction)
 
-    hex_gas_estimate |> convert_to_number |> convert(denomination)
+    hex_gas_estimate |> convert_to_number |> convert(denomination) |> round
   end
 
   defp get_result({:ok, eth_result}), do: Map.get(eth_result, "result")

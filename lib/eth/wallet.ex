@@ -1,3 +1,4 @@
+# NOTE: maybe do HD Wallets + create(mnemonic phrase)
 defmodule ETH.Wallet do
   import ETH.Utils
 

@@ -1,3 +1,4 @@
+# TODO: alot of the functions not tested!
 defmodule ETH.TransactionQueries.Test do
   use ExUnit.Case
 

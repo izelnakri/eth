@@ -4,31 +4,17 @@ defmodule ETH.Transaction do
   defdelegate parse(data), to: ETH.Transaction.Parser
   defdelegate to_list(data), to: ETH.Transaction.Parser
 
-  defdelegate set(params), to: ETH.Transaction.Setter
-  defdelegate set(wallet, params), to: ETH.Transaction.Setter
-  defdelegate set(sender_wallet, receiver_wallet, params_or_value), to: ETH.Transaction.Setter
+  defdelegate build(params), to: ETH.Transaction.Builder
+  defdelegate build(wallet, params), to: ETH.Transaction.Builder
+  defdelegate build(sender_wallet, receiver_wallet, params_or_value), to: ETH.Transaction.Builder
 
-  defdelegate hash_transaction(transaction), to: ETH.Transaction.Signer
-  defdelegate hash_transaction(transaction, include_signature), to: ETH.Transaction.Signer
-  defdelegate hash_transaction_list(transaction_list), to: ETH.Transaction.Signer
-
-  defdelegate hash_transaction_list(transaction_list, include_signature),
-    to: ETH.Transaction.Signer
+  defdelegate hash(transaction), to: ETH.Transaction.Signer
+  defdelegate hash(transaction, include_signature), to: ETH.Transaction.Signer
 
   defdelegate sign_transaction(transaction, private_key), to: ETH.Transaction.Signer
   defdelegate sign_transaction_list(transaction_list, private_key), to: ETH.Transaction.Signer
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
   defdelegate encode(signed_transaction_list), to: ETH.Transaction.Signer
-
-  def hash(transaction, include_signature \\ true)
-
-  def hash(transaction, include_signature) when is_list(transaction) do
-    ETH.Transaction.Signer.hash_transaction_list(transaction, include_signature)
-  end
-
-  def hash(transaction = %{}, include_signature) do
-    ETH.Transaction.Signer.hash_transaction(transaction, include_signature)
-  end
 
   def send_transaction(wallet, params) when is_map(params) do
     params
@@ -156,7 +142,7 @@ defmodule ETH.Transaction do
            s
          ]
        ) do
-    message_hash = hash_transaction_list(transaction_list, false)
+    message_hash = hash(transaction_list, false)
     chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
     v_int = buffer_to_int(v)
     target_v = if chain_id > 0, do: v_int - (chain_id * 2 + 8), else: v_int
@@ -175,7 +161,7 @@ defmodule ETH.Transaction do
 
     result =
       target_params
-      |> set
+      |> build
       |> sign_transaction(private_key)
       |> Base.encode16()
       |> send
