@@ -62,11 +62,11 @@ defmodule ETH do
   defdelegate hash(transaction, include_signature), to: ETH.Transaction
 
   defdelegate sign_transaction(transaction, private_key), to: ETH.Transaction.Signer
-  defdelegate sign_transaction_list(transaction_list, private_key), to: ETH.Transaction.Signer
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
   defdelegate encode(signed_transaction_list), to: ETH.Transaction.Signer
 
   defdelegate send_transaction(params_or_wallet, private_key_or_params), to: ETH.Transaction
+
   defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params),
     to: ETH.Transaction
 

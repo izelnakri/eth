@@ -159,7 +159,7 @@ defmodule TransactionTest do
         |> Map.get("raw")
         |> Transaction.parse()
         |> Transaction.to_list()
-        |> Transaction.sign_transaction_list(transaction["privateKey"])
+        |> Transaction.sign_transaction(transaction["privateKey"])
 
       result = Transaction.get_sender_address(signed_transaction_list)
       assert result == "0x" <> String.upcase(transaction["sendersAddress"])

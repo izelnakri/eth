@@ -12,7 +12,6 @@ defmodule ETH.Transaction do
   defdelegate hash(transaction, include_signature), to: ETH.Transaction.Signer
 
   defdelegate sign_transaction(transaction, private_key), to: ETH.Transaction.Signer
-  defdelegate sign_transaction_list(transaction_list, private_key), to: ETH.Transaction.Signer
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
   defdelegate encode(signed_transaction_list), to: ETH.Transaction.Signer
 

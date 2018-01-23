@@ -56,11 +56,11 @@ defmodule ETH.Transaction.Signer do
   def sign_transaction(transaction, private_key) when is_map(transaction) do
     transaction
     |> ETH.Transaction.to_list()
-    |> sign_transaction_list(private_key)
+    |> sign_transaction(private_key)
     |> ExRLP.encode()
   end
 
-  def sign_transaction_list(
+  def sign_transaction(
         transaction_list = [
           _nonce,
           _gas_price,
@@ -73,11 +73,11 @@ defmodule ETH.Transaction.Signer do
           _s
         ],
         <<private_key::binary-size(32)>>
-      ) do
-    to_signed_transaction_list(transaction_list, private_key)
+      ) when is_map(transaction_list) do
+    sign_transaction_list(transaction_list, private_key)
   end
 
-  def sign_transaction_list(
+  def sign_transaction(
         transaction_list = [
           _nonce,
           _gas_price,
@@ -90,12 +90,12 @@ defmodule ETH.Transaction.Signer do
           _s
         ],
         <<encoded_private_key::binary-size(64)>>
-      ) do
+      ) when is_list(transaction_list) do
     decoded_private_key = Base.decode16!(encoded_private_key, case: :mixed)
-    to_signed_transaction_list(transaction_list, decoded_private_key)
+    sign_transaction_list(transaction_list, decoded_private_key)
   end
 
-  defp to_signed_transaction_list(
+  defp sign_transaction_list(
          transaction_list = [
            nonce,
            gas_price,
@@ -104,8 +104,8 @@ defmodule ETH.Transaction.Signer do
            value,
            data,
            v,
-           _r,
-           _s
+           r,
+           s
          ],
          <<private_key::binary-size(32)>>
        ) do

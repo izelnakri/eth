@@ -59,7 +59,6 @@ defmodule ETH.Test do
              send_transaction: 3,
              send_transaction: 4,
              sign_transaction: 2,
-             sign_transaction_list: 2,
              syncing: 0,
              syncing!: 0,
              to_buffer: 1,
