@@ -30,5 +30,4 @@ jobs:
       - run: npm install -g testrpc
       - run: mix local.hex --force
       - run: mix deps.get
-      - run: mix ecto.create
       - run: mix test
