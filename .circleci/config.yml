@@ -29,5 +29,6 @@ jobs:
       - run: node -v
       - run: npm install -g testrpc
       - run: mix local.hex --force
+      - run: mix local.rebar --force
       - run: mix deps.get
       - run: mix test
