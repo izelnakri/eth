@@ -1,7 +1,12 @@
-require IEx
-
 defmodule ETH.Transaction.Builder do
   import ETH.Transaction.Parser
+
+  @moduledoc """
+    This module converts transaction parameters as a list or map to
+    Ethereum Transaction map. The result map is encoded with default ethereum hex encodings for
+    every value so you can sign and send it to any Ethereum client. It also assigns default values
+    and calculates gas prices if not provided.
+  """
 
   def build(params) when is_list(params) do
     params

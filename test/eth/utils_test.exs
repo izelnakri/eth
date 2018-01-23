@@ -88,4 +88,21 @@ defmodule ETH.UtilsTest do
     assert eth_address != another_eth_address
     assert eth_address != ETH.Utils.get_address(another_private_key |> Base.encode16())
   end
+
+  test "secp256k1_signature/2 works" do
+    hash =
+      "5c207a650b59a8c2d1271f5cbda78a658cb411a87271d68062e61ab1a3f85cf9"
+      |> Base.decode16!(case: :mixed)
+
+    private_key =
+      "e331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109"
+      |> Base.decode16!(case: :mixed)
+
+    target_signature =
+      "c2a738b1eb84280399115f4bec9e52b8de494a3ea7d9f069277119a02de4a49876f3168913e968e9484e2e0e447cd7adc56505e25cbc372330793a31f0bf7195"
+
+    secp256k1_signature = ETH.Utils.secp256k1_signature(hash, private_key)
+
+    assert secp256k1_signature[:signature] |> Base.encode16(case: :lower) == target_signature
+  end
 end

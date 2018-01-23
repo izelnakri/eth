@@ -2,8 +2,8 @@
 defmodule ETH.TransactionsTest do
   use ExUnit.Case
 
-  @transactions File.read!("test/fixtures/transactions.json") |> Poison.decode!()
-  @eip155_transactions File.read!("test/fixtures/eip155_vitalik_tests.json") |> Poison.decode!()
+  # @transactions File.read!("test/fixtures/transactions.json") |> Poison.decode!()
+  # @eip155_transactions File.read!("test/fixtures/eip155_vitalik_tests.json") |> Poison.decode!()
 
   # test "verify signature" do
   #   @transactions |> Enum.each(fn(transaction) ->

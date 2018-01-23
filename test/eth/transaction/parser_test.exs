@@ -4,6 +4,7 @@ defmodule ETH.Transaction.Parser.Test do
 
   alias ETH.Transaction
 
+  @transactions File.read!("test/fixtures/transactions.json") |> Poison.decode!()
   @first_transaction_rlp "0xf864808504a817c800825208943535353535353535353535353535353535353535808025a0044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116da0044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d"
   @not_signed_transaction_list [
     "",
@@ -278,5 +279,21 @@ defmodule ETH.Transaction.Parser.Test do
              "",
              ""
            ]
+  end
+
+  test "parse/1 and to_list/1 works for 0x hexed transactions" do
+    @transactions
+    |> Enum.slice(0..3)
+    |> Enum.map(fn transaction -> transaction["raw"] end)
+    |> Enum.each(fn transaction ->
+      transaction_list = transaction |> Transaction.parse() |> Transaction.to_list()
+
+      transaction_list
+      |> Stream.with_index()
+      |> Enum.each(fn {_value, index} ->
+        encoded_buffer = Enum.at(transaction_list, index) |> Base.encode16(case: :lower)
+        assert Enum.at(transaction, index) == "0x#{encoded_buffer}"
+      end)
+    end)
   end
 end

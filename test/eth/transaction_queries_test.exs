@@ -2,6 +2,16 @@
 defmodule ETH.TransactionQueries.Test do
   use ExUnit.Case
 
+  setup_all do
+    ETH.TestClient.start
+
+    on_exit fn ->
+      ETH.TestClient.stop
+    end
+
+    :ok
+  end
+
   @first_client_account_private_key "a160512c1dc5c33eff6ef89aae083108dcdcabdbe463481949d327fc2ac6ac48"
 
   # TODO: ETH.get_block_transactions

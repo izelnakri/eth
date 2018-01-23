@@ -1,6 +1,11 @@
 defmodule ETH.Transaction.Parser do
   import ETH.Utils
 
+  @moduledoc """
+    This module converts the input to a transaction map encoded with ethereum hex encodings.
+    It can also convert the input to a transaction list if needed.
+  """
+
   def parse("0x" <> encoded_transaction_rlp) do
     [nonce, gas_price, gas_limit, to, value, data, v, r, s] =
       encoded_transaction_rlp

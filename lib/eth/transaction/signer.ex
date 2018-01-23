@@ -3,6 +3,10 @@ defmodule ETH.Transaction.Signer do
 
   alias ETH.Transaction.Parser, as: TransactionParser
 
+  @moduledoc """
+    This module hashes or signs ethereum transactions provided as a transaction map or a list.
+  """
+
   def decode(<<rlp_encoded_transaction_list>>), do: ExRLP.decode(rlp_encoded_transaction_list)
 
   def encode(transaction_list = [_nonce, _gas_price, _gas_limit, _to, _value, _data, _v, _r, _s]) do
