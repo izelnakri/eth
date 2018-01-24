@@ -4,9 +4,11 @@ Application.put_env(:ethereumex, :url, Application.get_env(:eth, :url, "http://l
 
 {:ok, files} = File.ls("./test/support")
 
-Enum.each files, fn(file) ->
-  Code.require_file "support/#{file}", __DIR__
-end
+Enum.each(files, fn file ->
+  Code.require_file("support/#{file}", __DIR__)
+end)
+
+ETH.TestClient.stop()
 
 ExUnit.start()
 

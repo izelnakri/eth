@@ -3,11 +3,11 @@ defmodule ETH.Query.Test do
   use ExUnit.Case
 
   setup_all do
-    ETH.TestClient.start
+    ETH.TestClient.start()
 
-    on_exit fn ->
-      ETH.TestClient.stop
-    end
+    on_exit(fn ->
+      ETH.TestClient.stop()
+    end)
 
     :ok
   end

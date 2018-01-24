@@ -58,8 +58,8 @@ defmodule ETH do
   defdelegate build(wallet, params), to: ETH.Transaction.Builder
   defdelegate build(sender_wallet, receiver_wallet, params_or_value), to: ETH.Transaction.Builder
 
-  defdelegate hash(transaction), to: ETH.Transaction
-  defdelegate hash(transaction, include_signature), to: ETH.Transaction
+  defdelegate hash_transaction(transaction), to: ETH.Transaction
+  defdelegate hash_transaction(transaction, include_signature), to: ETH.Transaction
 
   defdelegate sign_transaction(transaction, private_key), to: ETH.Transaction.Signer
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer

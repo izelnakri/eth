@@ -9,8 +9,8 @@ defmodule ETH.Transaction do
   defdelegate build(wallet, params), to: ETH.Transaction.Builder
   defdelegate build(sender_wallet, receiver_wallet, params_or_value), to: ETH.Transaction.Builder
 
-  defdelegate hash(transaction), to: ETH.Transaction.Signer
-  defdelegate hash(transaction, include_signature), to: ETH.Transaction.Signer
+  defdelegate hash_transaction(transaction), to: ETH.Transaction.Signer
+  defdelegate hash_transaction(transaction, include_signature), to: ETH.Transaction.Signer
 
   defdelegate sign_transaction(transaction, private_key), to: ETH.Transaction.Signer
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
@@ -68,6 +68,7 @@ defmodule ETH.Transaction do
   end
 
   def send(signature), do: HttpClient.eth_send_raw_transaction(signature)
+
   def send!(signature) do
     {:ok, transaction_hash} = HttpClient.eth_send_raw_transaction(signature)
     transaction_hash
@@ -146,7 +147,7 @@ defmodule ETH.Transaction do
            s
          ]
        ) do
-    message_hash = hash(transaction_list, false)
+    message_hash = hash_transaction(transaction_list, false)
     chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
     v_int = buffer_to_int(v)
     target_v = if chain_id > 0, do: v_int - (chain_id * 2 + 8), else: v_int

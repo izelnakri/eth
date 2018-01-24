@@ -45,7 +45,8 @@ defmodule ETH.TransactionQueries do
   end
 
   def get_block_transaction_count!(block_hash) do
-    {:ok, transaction_count} = HttpClient.eth_get_block_transaction_count_by_hash(block_hash)
+    {:ok, transaction_count} =
+      HttpClient.eth_get_block_transaction_count_by_hash_transaction(block_hash)
 
     transaction_count
   end
@@ -94,7 +95,9 @@ defmodule ETH.TransactionQueries do
     case HttpClient.eth_get_transaction_receipt(transaction_hash) do
       {:ok, raw_transaction_receipt} ->
         {:ok, convert_transaction_receipt(raw_transaction_receipt)}
-      error -> error
+
+      error ->
+        error
     end
   end
 
@@ -136,7 +139,8 @@ defmodule ETH.TransactionQueries do
   end
 
   def convert_transaction_receipt(result) do
-    result |> Enum.reduce(%{}, fn tuple, acc ->
+    result
+    |> Enum.reduce(%{}, fn tuple, acc ->
       {key, value} = tuple
 
       case key do

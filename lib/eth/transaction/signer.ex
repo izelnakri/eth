@@ -13,9 +13,9 @@ defmodule ETH.Transaction.Signer do
     ExRLP.encode(transaction_list)
   end
 
-  def hash(transaction, include_signature \\ true)
+  def hash_transaction(transaction, include_signature \\ true)
 
-  def hash(transaction_list, include_signature) when is_list(transaction_list) do
+  def hash_transaction(transaction_list, include_signature) when is_list(transaction_list) do
     target_list =
       case include_signature do
         true ->
@@ -37,7 +37,7 @@ defmodule ETH.Transaction.Signer do
     |> keccak256
   end
 
-  def hash(
+  def hash_transaction(
         transaction = %{
           to: _to,
           value: _value,
@@ -54,14 +54,13 @@ defmodule ETH.Transaction.Signer do
     |> Map.delete(:chain_id)
     |> TransactionParser.to_list()
     |> List.insert_at(-1, chain_id)
-    |> hash(include_signature)
+    |> hash_transaction(include_signature)
   end
 
   def sign_transaction(transaction, private_key) when is_map(transaction) do
     transaction
     |> ETH.Transaction.to_list()
     |> sign_transaction(private_key)
-    |> ExRLP.encode()
   end
 
   def sign_transaction(
@@ -116,7 +115,7 @@ defmodule ETH.Transaction.Signer do
          <<private_key::binary-size(32)>>
        ) do
     chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
-    message_hash = hash(transaction_list, false)
+    message_hash = hash_transaction(transaction_list, false)
 
     [signature: signature, recovery: recovery] = secp256k1_signature(message_hash, private_key)
 
@@ -126,5 +125,6 @@ defmodule ETH.Transaction.Signer do
     sig_v = if chain_id > 0, do: initial_v + (chain_id * 2 + 8), else: initial_v
 
     [nonce, gas_price, gas_limit, to, value, data, <<sig_v>>, sig_r, sig_s]
+    |> ExRLP.encode()
   end
 end

@@ -11,12 +11,11 @@ defmodule ETH.WalletTest do
     assert wallet[:private_key] != second_wallet[:private_key]
     assert wallet[:public_key]
 
-    assert wallet[:public_key] ==
-             ETH.Utils.get_public_key(wallet[:private_key]) |> Base.encode16()
+    assert wallet[:public_key] == ETH.get_public_key(wallet[:private_key]) |> Base.encode16()
 
     assert wallet[:public_key] != second_wallet[:public_key]
     assert wallet[:eth_address]
-    assert wallet[:eth_address] == ETH.Utils.get_address(wallet[:public_key])
+    assert wallet[:eth_address] == ETH.get_address(wallet[:public_key])
     assert wallet[:eth_address] != second_wallet[:eth_address]
 
     assert wallet[:mnemonic_phrase]
