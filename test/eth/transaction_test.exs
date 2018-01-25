@@ -70,6 +70,128 @@ defmodule TransactionTest do
            }
   end
 
+  test "send_transaction(params_as_list, private_key) works" do
+    result =
+      ETH.send_transaction(
+        [
+          to: @first_random_wallet.eth_address,
+          value: 5000
+        ],
+        @first_wallet_in_client.private_key
+      )
+
+    {:ok, transaction_hash} = result
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(transaction_hash) |> Map.drop([:block_hash, :block_number, :hash]) ==
+             %{
+               from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+               gas: 21000,
+               gas_price: 20_000_000_000,
+               input: "0x0",
+               nonce: 1,
+               to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+               transaction_index: 0,
+               value: 5000
+             }
+  end
+
+  test "send_transaction(params_as_map, private_key) works" do
+    result =
+      ETH.send_transaction(
+        %{
+          to: @first_random_wallet.eth_address,
+          value: 1000,
+          data: "Izel Nakri"
+        },
+        @first_wallet_in_client.private_key
+      )
+
+    {:ok, transaction_hash} = result
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(transaction_hash) |> Map.drop([:block_hash, :block_number, :hash]) ==
+             %{
+               from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+               gas: 21816,
+               gas_price: 20_000_000_000,
+               input: "0x497a656c204e616b7269",
+               nonce: 2,
+               to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+               transaction_index: 0,
+               value: 1000
+             }
+  end
+
+  test "send_transaction(sender_wallet, receiver_wallet, value) works" do
+    {:ok, tx_hash} = ETH.send_transaction(@first_wallet_in_client, @first_random_wallet, 3200)
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+             gas: 21000,
+             gas_price: 20_000_000_000,
+             input: "0x0",
+             nonce: 3,
+             to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+             transaction_index: 0,
+             value: 3200
+           }
+  end
+
+  test "send_transaction(sender_wallet, receiver_wallet, params_as_map) works" do
+    {:ok, tx_hash} =
+      ETH.send_transaction(@first_wallet_in_client, @first_random_wallet, %{
+        data: "Sent from eth.ex",
+        gas_limit: 40000,
+        gas_price: 30_000_000_000,
+        value: 5000
+      })
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+             gas: 40000,
+             gas_price: 30_000_000_000,
+             input: "0x53656e742066726f6d206574682e6578",
+             nonce: 4,
+             to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+             transaction_index: 0,
+             value: 5000
+           }
+  end
+
+  test "send_transaction(sender_wallet, receiver_wallet, params_as_list) works" do
+    {:ok, tx_hash} =
+      ETH.send_transaction(
+        @first_wallet_in_client,
+        @first_random_wallet,
+        data: "Sent from eth.ex",
+        gas_limit: 40000,
+        gas_price: 30_000_000_000,
+        value: 5000
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+             gas: 40000,
+             gas_price: 30_000_000_000,
+             input: "0x53656e742066726f6d206574682e6578",
+             nonce: 5,
+             to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+             transaction_index: 0,
+             value: 5000
+           }
+  end
+
+  # missing:   def send_transaction(sender_wallet, receiver_wallet, params) when is_list(params) do
+
   # ETH.build(%{
   #   nonce: 1,
   #   to: "0x0dcd857b3c5db88cb7c025f0ef229331cfadffe5",
