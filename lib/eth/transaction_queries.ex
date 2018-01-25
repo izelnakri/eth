@@ -45,8 +45,7 @@ defmodule ETH.TransactionQueries do
   end
 
   def get_block_transaction_count!(block_hash) do
-    {:ok, transaction_count} =
-      HttpClient.eth_get_block_transaction_count_by_hash_transaction(block_hash)
+    {:ok, transaction_count} = HttpClient.eth_get_block_transaction_count_by_hash(block_hash)
 
     transaction_count
   end

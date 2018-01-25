@@ -1,8 +1,8 @@
+# NOTE: random wallet cannot send transaction properly?!?
 require IEx
 
 defmodule TransactionTest do
   use ExUnit.Case
-  import ETH.Utils
 
   setup_all do
     ETH.TestClient.start()
@@ -14,16 +14,6 @@ defmodule TransactionTest do
     :ok
   end
 
-  @first_example_transaction %{
-    nonce: "0x00",
-    gas_price: "0x09184e72a000",
-    gas_limit: "0x2710",
-    to: "0x0000000000000000000000000000000000000000",
-    value: "0x00",
-    data: "0x7f7465737432000000000000000000000000000000000000000000000000000000600057",
-    # EIP 155 chainId - mainnet: 1, ropsten: 3
-    chain_id: 3
-  }
   @first_wallet_in_client %{
     eth_address: "0x051D51BA1E1D58DB72EFEA63549A6792C8F5CB13",
     mnemonic_phrase:
@@ -58,7 +48,7 @@ defmodule TransactionTest do
     Process.sleep(3850)
 
     assert ETH.get_transaction!(transaction_hash) |> Map.drop([:block_hash, :block_number]) == %{
-             from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+             from: String.downcase(@first_wallet_in_client.eth_address),
              gas: 21000,
              gas_price: 20_000_000_000,
              hash: "0x5c1cf004a7d239c65e1ef582826258b7835b0301063605c238947682fe3303d8",
@@ -86,12 +76,12 @@ defmodule TransactionTest do
 
     assert ETH.get_transaction!(transaction_hash) |> Map.drop([:block_hash, :block_number, :hash]) ==
              %{
-               from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+               from: String.downcase(@first_wallet_in_client.eth_address),
                gas: 21000,
                gas_price: 20_000_000_000,
                input: "0x0",
                nonce: 1,
-               to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+               to: String.downcase(@first_random_wallet.eth_address),
                transaction_index: 0,
                value: 5000
              }
@@ -114,12 +104,12 @@ defmodule TransactionTest do
 
     assert ETH.get_transaction!(transaction_hash) |> Map.drop([:block_hash, :block_number, :hash]) ==
              %{
-               from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+               from: String.downcase(@first_wallet_in_client.eth_address),
                gas: 21816,
                gas_price: 20_000_000_000,
                input: "0x497a656c204e616b7269",
                nonce: 2,
-               to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+               to: String.downcase(@first_random_wallet.eth_address),
                transaction_index: 0,
                value: 1000
              }
@@ -131,12 +121,12 @@ defmodule TransactionTest do
     Process.sleep(3850)
 
     assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
-             from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+             from: String.downcase(@first_wallet_in_client.eth_address),
              gas: 21000,
              gas_price: 20_000_000_000,
              input: "0x0",
              nonce: 3,
-             to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+             to: String.downcase(@first_random_wallet.eth_address),
              transaction_index: 0,
              value: 3200
            }
@@ -154,12 +144,12 @@ defmodule TransactionTest do
     Process.sleep(3850)
 
     assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
-             from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+             from: String.downcase(@first_wallet_in_client.eth_address),
              gas: 40000,
              gas_price: 30_000_000_000,
              input: "0x53656e742066726f6d206574682e6578",
              nonce: 4,
-             to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+             to: String.downcase(@first_random_wallet.eth_address),
              transaction_index: 0,
              value: 5000
            }
@@ -179,31 +169,306 @@ defmodule TransactionTest do
     Process.sleep(3850)
 
     assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
-             from: "0x051d51ba1e1d58db72efea63549a6792c8f5cb13",
+             from: String.downcase(@first_wallet_in_client.eth_address),
              gas: 40000,
              gas_price: 30_000_000_000,
              input: "0x53656e742066726f6d206574682e6578",
              nonce: 5,
-             to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+             to: String.downcase(@first_random_wallet.eth_address),
              transaction_index: 0,
              value: 5000
            }
   end
 
-  # missing:   def send_transaction(sender_wallet, receiver_wallet, params) when is_list(params) do
+  test "send_transaction(sender_wallet, receiver_wallet, value, private_key) works" do
+    {:ok, tx_hash} =
+      ETH.send_transaction(
+        @first_wallet_in_client,
+        @first_random_wallet,
+        10,
+        @first_wallet_in_client.private_key
+      )
 
-  # ETH.build(%{
-  #   nonce: 1,
-  #   to: "0x0dcd857b3c5db88cb7c025f0ef229331cfadffe5",
-  #   value: 22,
-  #   gas_limit: 100_000,
-  #   gas_price: 1000,
-  #   from: "0x42c343d8b77a9106d7112b71ba6b3030a34ba560"
-  # })
-  # |> ETH.sign_transaction(
-  #   "75c3b11e480f8ba3db792424bebda1fc8dea2b254287e3a9af9ed50c7d255720"
-  # )
-  # |> Base.encode16(case: :lower)
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 21000,
+             gas_price: 20_000_000_000,
+             input: "0x0",
+             nonce: 6,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 10
+           }
+  end
+
+  test "send_transaction(sender_wallet, receiver_wallet, params_as_map, private_key) works" do
+    {:ok, tx_hash} =
+      ETH.send_transaction(
+        @first_wallet_in_client,
+        @first_random_wallet,
+        %{
+          data: "Great one",
+          value: 1115
+        },
+        @first_wallet_in_client.private_key
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 21748,
+             gas_price: 20_000_000_000,
+             input: "0x4772656174206f6e65",
+             nonce: 7,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 1115
+           }
+  end
+
+  test "send_transaction(sender_wallet, receiver_wallet, params_as_list, private_key) works" do
+    {:ok, tx_hash} =
+      ETH.send_transaction(
+        @first_wallet_in_client,
+        @first_random_wallet,
+        [
+          data: "Great one",
+          value: 2222,
+          gas_price: 100_000_000_000
+        ],
+        @first_wallet_in_client.private_key
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 21748,
+             gas_price: 100_000_000_000,
+             input: "0x4772656174206f6e65",
+             nonce: 8,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 2222
+           }
+  end
+
+  test "send_transaction!(wallet, params) works" do
+    transaction_hash =
+      ETH.send_transaction!(@first_wallet_in_client, %{
+        to: @first_random_wallet.eth_address,
+        value: 22
+      })
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(transaction_hash) |> Map.drop([:block_hash, :block_number, :hash]) ==
+             %{
+               from: String.downcase(@first_wallet_in_client.eth_address),
+               gas: 21000,
+               gas_price: 20_000_000_000,
+               input: "0x0",
+               nonce: 9,
+               to: "0xdf7a2dc05778d1b507e921fb8ad78cb431590ba7",
+               transaction_index: 0,
+               value: 22
+             }
+  end
+
+  test "send_transaction!(params_as_list, private_key) works" do
+    transaction_hash =
+      ETH.send_transaction!(
+        [
+          to: @first_random_wallet.eth_address,
+          value: 5000
+        ],
+        @first_wallet_in_client.private_key
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(transaction_hash) |> Map.drop([:block_hash, :block_number, :hash]) ==
+             %{
+               from: String.downcase(@first_wallet_in_client.eth_address),
+               gas: 21000,
+               gas_price: 20_000_000_000,
+               input: "0x0",
+               nonce: 10,
+               to: String.downcase(@first_random_wallet.eth_address),
+               transaction_index: 0,
+               value: 5000
+             }
+  end
+
+  test "send_transaction!(params_as_map, private_key) works" do
+    transaction_hash =
+      ETH.send_transaction!(
+        %{
+          to: @first_random_wallet.eth_address,
+          value: 1000,
+          data: "Izel Nakri"
+        },
+        @first_wallet_in_client.private_key
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(transaction_hash) |> Map.drop([:block_hash, :block_number, :hash]) ==
+             %{
+               from: String.downcase(@first_wallet_in_client.eth_address),
+               gas: 21816,
+               gas_price: 20_000_000_000,
+               input: "0x497a656c204e616b7269",
+               nonce: 11,
+               to: String.downcase(@first_random_wallet.eth_address),
+               transaction_index: 0,
+               value: 1000
+             }
+  end
+
+  test "send_transaction!(sender_wallet, receiver_wallet, value) works" do
+    tx_hash = ETH.send_transaction!(@first_wallet_in_client, @first_random_wallet, 3200)
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 21000,
+             gas_price: 20_000_000_000,
+             input: "0x0",
+             nonce: 12,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 3200
+           }
+  end
+
+  test "send_transaction!(sender_wallet, receiver_wallet, params_as_map) works" do
+    tx_hash =
+      ETH.send_transaction!(@first_wallet_in_client, @first_random_wallet, %{
+        data: "Sent from eth.ex",
+        gas_limit: 40000,
+        gas_price: 30_000_000_000,
+        value: 5000
+      })
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 40000,
+             gas_price: 30_000_000_000,
+             input: "0x53656e742066726f6d206574682e6578",
+             nonce: 13,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 5000
+           }
+  end
+
+  test "send_transaction!(sender_wallet, receiver_wallet, params_as_list) works" do
+    tx_hash =
+      ETH.send_transaction!(
+        @first_wallet_in_client,
+        @first_random_wallet,
+        data: "Sent from eth.ex",
+        gas_limit: 40000,
+        gas_price: 30_000_000_000,
+        value: 5000
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 40000,
+             gas_price: 30_000_000_000,
+             input: "0x53656e742066726f6d206574682e6578",
+             nonce: 14,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 5000
+           }
+  end
+
+  test "send_transaction!(sender_wallet, receiver_wallet, value, private_key) works" do
+    tx_hash =
+      ETH.send_transaction!(
+        @first_wallet_in_client,
+        @first_random_wallet,
+        10,
+        @first_wallet_in_client.private_key
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 21000,
+             gas_price: 20_000_000_000,
+             input: "0x0",
+             nonce: 15,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 10
+           }
+  end
+
+  test "send_transaction!(sender_wallet, receiver_wallet, params_as_map, private_key) works" do
+    tx_hash =
+      ETH.send_transaction!(
+        @first_wallet_in_client,
+        @first_random_wallet,
+        %{
+          data: "Great one",
+          value: 1115
+        },
+        @first_wallet_in_client.private_key
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 21748,
+             gas_price: 20_000_000_000,
+             input: "0x4772656174206f6e65",
+             nonce: 16,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 1115
+           }
+  end
+
+  test "send_transaction!(sender_wallet, receiver_wallet, params_as_list, private_key) works" do
+    tx_hash =
+      ETH.send_transaction!(
+        @first_wallet_in_client,
+        @first_random_wallet,
+        [
+          data: "Great one",
+          value: 2222,
+          gas_price: 20_000_000_000
+        ],
+        @first_wallet_in_client.private_key
+      )
+
+    Process.sleep(3850)
+
+    assert ETH.get_transaction!(tx_hash) |> Map.drop([:block_hash, :block_number, :hash]) == %{
+             from: String.downcase(@first_wallet_in_client.eth_address),
+             gas: 21748,
+             gas_price: 20_000_000_000,
+             input: "0x4772656174206f6e65",
+             nonce: 17,
+             to: String.downcase(@first_random_wallet.eth_address),
+             transaction_index: 0,
+             value: 2222
+           }
+  end
 
   test "send works" do
     result =
@@ -223,25 +488,53 @@ defmodule TransactionTest do
     assert result == "0xfa19fa6afd6c5b5ef9979ecf3b437e0b844484cc3a3b6f97082be60799767510"
   end
 
-  # test "send_transaction(wallet, params) works when params is a wallet" do
-  #   result = ETH.send_transaction(@first_wallet_in_client, %{
-  #     to: @first_random_wallet.eth_address,
-  #     value: 300,
-  #     data: ""
-  #   })
-  #
-  #   # IEx.pry
-  #   # do various variable sends ->
-  # end
-  # TODO: DO all types of send_transaction methods
+  test "get_sender_public_key(rlp_encoded_transaction) works" do
+    @transactions
+    |> Enum.each(fn transaction ->
+      private_key = Map.get(transaction, "privateKey")
 
-  # TODO: test send() works
+      if private_key do
+        target_public_key = ETH.Wallet.create(private_key) |> Map.get(:public_key)
 
-  # TODO: get_senders_public_key works on all variations
+        encoded_rlp =
+          Map.get(transaction, "raw")
+          |> ETH.parse()
+          |> ETH.to_list()
+          |> ExRLP.encode()
+          |> Base.encode16()
 
-  # TODO: get_sender_address works on all variations
+        assert ETH.get_senders_public_key("0x" <> encoded_rlp) ==
+                 target_public_key |> Base.decode16!()
+      end
+    end)
+  end
 
-  test "get_sender_adress/1 works" do
+  test "get_sender_public_key(signed_transaction_list) works" do
+    @transactions
+    |> Enum.each(fn transaction ->
+      private_key = Map.get(transaction, "privateKey")
+
+      if private_key do
+        target_public_key = ETH.Wallet.create(private_key) |> Map.get(:public_key)
+
+        assert Map.get(transaction, "raw")
+               |> ETH.Transaction.parse()
+               |> ETH.Transaction.to_list()
+               |> ETH.get_senders_public_key() == target_public_key |> Base.decode16!()
+      end
+    end)
+  end
+
+  test "get_sender_address(rlp_encoded_transaction) works" do
+    @eip155_transactions
+    |> Enum.each(fn transaction ->
+      sender_address = "0x" <> (transaction |> Map.get("sender") |> String.upcase())
+
+      assert transaction |> Map.get("rlp") |> ETH.get_sender_address() == sender_address
+    end)
+  end
+
+  test "get_sender_adress(signed_transaction_list) works" do
     @transactions
     |> Enum.slice(0..2)
     |> Enum.each(fn transaction ->
@@ -251,8 +544,9 @@ defmodule TransactionTest do
         |> ETH.parse()
         |> ETH.to_list()
 
-      result = ETH.get_sender_address(transaction_list)
-      assert result == "0x" <> String.upcase(transaction["sendersAddress"])
+      sender_address = "0x" <> String.upcase(transaction["sendersAddress"])
+
+      assert ETH.get_sender_address(transaction_list) == sender_address
     end)
   end
 
@@ -266,15 +560,4 @@ defmodule TransactionTest do
       assert ETH.get_sender_address(transaction_list) == "0x#{sender_address}"
     end)
   end
-
-  # NOTE: probably not needed changes th API
-  # test "can sign an empty transaction with right chain id" do
-  #   ETH.hash_transaction(%{chain_id: 42 })
-  # end
-
-  # test "sign works" do
-  #   signature = ETH.sign_transaction_list(@first_example_transaction, @first_example_wallet.private_key)
-  #     |> Base.encode16(case: :lower)
-  #   assert signature == "f889808609184e72a00082271094000000000000000000000000000000000000000080a47f746573743200000000000000000000000000000000000000000000000000000060005729a0f2d54d3399c9bcd3ac3482a5ffaeddfe68e9a805375f626b4f2f8cf530c2d95aa05b3bb54e6e8db52083a9b674e578c843a87c292f0383ddba168573808d36dc8e"
-  # end
 end

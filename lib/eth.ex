@@ -73,6 +73,14 @@ defmodule ETH do
   defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params, private_key),
     to: ETH.Transaction
 
+  defdelegate send_transaction!(params_or_wallet, private_key_or_params), to: ETH.Transaction
+
+  defdelegate send_transaction!(sender_wallet, receiver_wallet, value_or_params),
+    to: ETH.Transaction
+
+  defdelegate send_transaction!(sender_wallet, receiver_wallet, value_or_params, private_key),
+    to: ETH.Transaction
+
   defdelegate send(signature), to: ETH.Transaction
   defdelegate send!(signature), to: ETH.Transaction
   defdelegate get_senders_public_key(transaction_input), to: ETH.Transaction
