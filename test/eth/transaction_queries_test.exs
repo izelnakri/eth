@@ -228,6 +228,7 @@ defmodule ETH.TransactionQueries.Test do
     assert ETH.get_transaction_from_block(first_block_hash, 0) |> elem(0) == :error
 
     first_tx_hash = ETH.send_transaction!(@first_wallet_in_client, @second_wallet_in_client, 500)
+
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 

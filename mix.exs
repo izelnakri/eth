@@ -4,7 +4,7 @@ defmodule Eth.Mixfile do
   def project do
     [
       app: :eth,
-      version: "0.3.5",
+      version: "0.4.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
