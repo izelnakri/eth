@@ -109,8 +109,8 @@ defmodule ETH.Transaction.Signer do
            value,
            data,
            v,
-           r,
-           s
+           _r,
+           _s
          ],
          <<private_key::binary-size(32)>>
        ) do

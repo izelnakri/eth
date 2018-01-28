@@ -67,7 +67,8 @@ defmodule ETH.Transaction.Builder do
     value = Keyword.get(params, :value, 0)
     gas_price = Keyword.get(params, :gas_price, ETH.gas_price!())
     data = Keyword.get(params, :data, "")
-    nonce = Keyword.get(params, :nonce, ETH.get_transaction_count!(params[:from]))
+    # NOTE: this probably causes bug
+    nonce = Keyword.get(params, :nonce, ETH.get_transaction_count!(params[:from], "pending"))
     chain_id = Keyword.get(params, :chain_id, 3)
 
     gas_limit =
@@ -91,7 +92,7 @@ defmodule ETH.Transaction.Builder do
     value = Map.get(params, :value, 0)
     gas_price = Map.get(params, :gas_price, ETH.gas_price!())
     data = Map.get(params, :data, "")
-    nonce = Map.get(params, :nonce, ETH.get_transaction_count!(params.from))
+    nonce = Map.get(params, :nonce, ETH.get_transaction_count!(params.from, "pending"))
     chain_id = Map.get(params, :chain_id, 3)
 
     gas_limit =

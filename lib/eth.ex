@@ -24,15 +24,19 @@ defmodule ETH do
   defdelegate gas_price, to: ETH.Query
   defdelegate gas_price!, to: ETH.Query
   defdelegate call(call_params), to: ETH.Query
+  defdelegate call(call_params, state), to: ETH.Query
   defdelegate call!(call_params), to: ETH.Query
+  defdelegate call!(call_params, state), to: ETH.Query
   defdelegate get_block, to: ETH.Query
   defdelegate get_block(identifier), to: ETH.Query
   defdelegate get_block!, to: ETH.Query
   defdelegate get_block!(identifier), to: ETH.Query
   defdelegate get_balance(wallet_or_address), to: ETH.Query
-  defdelegate get_balance(wallet_or_address, denomination), to: ETH.Query
+  defdelegate get_balance(wallet_or_address, state), to: ETH.Query
+  defdelegate get_balance(wallet_or_address, denomination, state), to: ETH.Query
   defdelegate get_balance!(wallet_or_address), to: ETH.Query
-  defdelegate get_balance!(wallet_or_address, denomination), to: ETH.Query
+  defdelegate get_balance!(wallet_or_address, state), to: ETH.Query
+  defdelegate get_balance!(wallet_or_address, denomination, state), to: ETH.Query
   defdelegate estimate_gas(transaction), to: ETH.Query
   defdelegate estimate_gas!(transaction), to: ETH.Query
   defdelegate estimate_gas(transaction, denomination), to: ETH.Query
@@ -49,7 +53,9 @@ defmodule ETH do
   defdelegate get_transaction_receipt(transaction_hash), to: ETH.TransactionQueries
   defdelegate get_transaction_receipt!(transaction_hash), to: ETH.TransactionQueries
   defdelegate get_transaction_count(wallet_or_address), to: ETH.TransactionQueries
+  defdelegate get_transaction_count(wallet_or_address, state), to: ETH.TransactionQueries
   defdelegate get_transaction_count!(wallet_or_address), to: ETH.TransactionQueries
+  defdelegate get_transaction_count!(wallet_or_address, state), to: ETH.TransactionQueries
 
   defdelegate parse(data), to: ETH.Transaction.Parser
   defdelegate to_list(data), to: ETH.Transaction.Parser

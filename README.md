@@ -69,7 +69,7 @@ Additionally this library wouldnt exist without the libraries below:
 - libsecp256k1
 
 ### TODO:
-contract creation via
+Ethereum Smart Contracts, small enhancements
 
 ## Installation
 
@@ -84,6 +84,12 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/eth](https://hexdocs.pm/eth).
+### Running the tests
+
+Install a testrpc(now renamed to ganache-cli) to run ethereum locally:
+```npm install -g ganache-cli```
+
+Elixir tests automatically spawns and kills the ganache-cli process. All you need to do now is to run the tests in sequence thus --seed 0:
+```mix test --seed 0```
+
+The docs can be found at [https://hexdocs.pm/eth](https://hexdocs.pm/eth).

@@ -45,10 +45,10 @@ defmodule ETH.Query do
   end
 
   # TODO: test this one
-  def call(call_params), do: HttpClient.eth_call(call_params)
+  def call(call_params, state \\ "latest"), do: HttpClient.eth_call(call_params, state)
 
-  def call!(call_params) do
-    {:ok, result} = HttpClient.eth_call(call_params)
+  def call!(call_params, state \\ "latest") do
+    {:ok, result} = HttpClient.eth_call(call_params, state)
 
     result
   end
@@ -99,10 +99,10 @@ defmodule ETH.Query do
     convert_block_details(raw_block_details)
   end
 
-  def get_balance(param, denomination \\ :ether)
+  def get_balance(param, denomination \\ :ether, state \\ "latest")
 
-  def get_balance(wallet, denomination) when is_map(wallet) do
-    case HttpClient.eth_get_balance(wallet.eth_address) do
+  def get_balance(wallet, denomination, state) when is_map(wallet) do
+    case HttpClient.eth_get_balance(wallet.eth_address, state) do
       {:ok, hex_balance} ->
         balance =
           hex_balance
@@ -116,8 +116,8 @@ defmodule ETH.Query do
     end
   end
 
-  def get_balance(eth_address, denomination) do
-    case HttpClient.eth_get_balance(eth_address) do
+  def get_balance(eth_address, denomination, state) do
+    case HttpClient.eth_get_balance(eth_address, state) do
       {:ok, hex_balance} ->
         balance =
           hex_balance
@@ -131,18 +131,18 @@ defmodule ETH.Query do
     end
   end
 
-  def get_balance!(param, denomination \\ :ether)
+  def get_balance!(param, denomination \\ :ether, state \\ "latest")
 
-  def get_balance!(wallet, denomination) when is_map(wallet) do
-    {:ok, hex_balance} = HttpClient.eth_get_balance(wallet.eth_address)
+  def get_balance!(wallet, denomination, state) when is_map(wallet) do
+    {:ok, hex_balance} = HttpClient.eth_get_balance(wallet.eth_address, state)
 
     hex_balance
     |> convert_to_number
     |> convert(denomination)
   end
 
-  def get_balance!(eth_address, denomination) do
-    {:ok, hex_balance} = HttpClient.eth_get_balance(eth_address)
+  def get_balance!(eth_address, denomination, state) do
+    {:ok, hex_balance} = HttpClient.eth_get_balance(eth_address, state)
 
     hex_balance
     |> convert_to_number
@@ -168,9 +168,6 @@ defmodule ETH.Query do
 
     hex_gas_estimate |> convert_to_number |> convert(denomination) |> round
   end
-
-  defp get_result({:ok, eth_result}), do: Map.get(eth_result, "result")
-  defp get_result(error), do: raise(error)
 
   def convert_transaction_log(log) do
     Enum.reduce(log, %{}, fn tuple, acc ->
