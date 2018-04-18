@@ -85,6 +85,7 @@ defmodule ETH.TransactionQueries do
 
   def get_transaction_receipt(transaction_hash) do
     case HttpClient.eth_get_transaction_receipt(transaction_hash) do
+      {:ok, nil} -> {:error, nil}
       {:ok, raw_transaction_receipt} ->
         {:ok, convert_transaction_receipt(raw_transaction_receipt)}
 
