@@ -68,6 +68,9 @@ Additionally this library wouldnt exist without the libraries below:
 - keccakf1600
 - libsecp256k1
 
+#### NOTE:
+To properly use this package, you will need to run `rebar compile eunit` for [libsecp256k1](https://github.com/exthereum/libsecp256k1).
+
 ### TODO:
 Ethereum Smart Contracts, small enhancements
 
