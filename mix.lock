@@ -4,7 +4,7 @@
   "earmark": {:hex, :earmark, "1.2.3", "206eb2e2ac1a794aa5256f3982de7a76bf4579ff91cb28d0e17ea2c9491e46a4", [:mix], []},
   "ethereumex": {:hex, :ethereumex, "0.3.0", "9d5e25dc2f9ed357f9f7f2a49e09b608b41a56283c20f50e896a11af225cc723", [:mix], [{:httpoison, "~> 1.0.0", [hex: :httpoison, optional: false]}, {:poison, "~> 3.1.0", [hex: :poison, optional: false]}]},
   "ex_doc": {:hex, :ex_doc, "0.16.3", "cd2a4cfe5d26e37502d3ec776702c72efa1adfa24ed9ce723bb565f4c30bd31a", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, optional: false]}]},
-  "ex_rlp": {:hex, :ex_rlp, "0.2.1", "bd320900d6316cdfe01d365d4bda22eb2f39b359798daeeffd3bd1ca7ba958ec", [:mix], []},
+  "ex_rlp": {:hex, :ex_rlp, "0.5.2", "7f4ce7bd55e543c054ce6d49629b01e9833c3462e3d547952be89865f39f2c58", [:mix], [], "hexpm"},
   "hackney": {:hex, :hackney, "1.11.0", "4951ee019df102492dabba66a09e305f61919a8a183a7860236c0fde586134b6", [:rebar3], [{:certifi, "2.0.0", [hex: :certifi, optional: false]}, {:idna, "5.1.0", [hex: :idna, optional: false]}, {:metrics, "1.0.1", [hex: :metrics, optional: false]}, {:mimerl, "1.0.2", [hex: :mimerl, optional: false]}, {:ssl_verify_fun, "1.1.1", [hex: :ssl_verify_fun, optional: false]}]},
   "hex_prefix": {:hex, :hex_prefix, "0.1.0", "e96b5cbb6ad8493196ce193726240023f5ce0ae0753118a19a5b43e2db0267ca", [:mix], []},
   "hexate": {:hex, :hexate, "0.6.1", "1cea42e462c1daa32223127d4752e71016c3d933d492b9bb7fa4709a4a0fd50d", [:mix], []},
