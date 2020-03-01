@@ -1,3 +1,4 @@
+# NOTE: FAILING
 # NOTE: random wallet cannot send transaction properly?!?
 require IEx
 

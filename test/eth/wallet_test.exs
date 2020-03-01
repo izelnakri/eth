@@ -1,3 +1,4 @@
+# NOTE: PASSING
 defmodule ETH.WalletTest do
   use ExUnit.Case
 

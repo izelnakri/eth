@@ -1,3 +1,4 @@
+# NOTE: PASSING
 # TODO: ETH.call
 defmodule ETH.Query.Test do
   use ExUnit.Case
@@ -82,6 +83,7 @@ defmodule ETH.Query.Test do
              :hash,
              :logs_bloom,
              :miner,
+             :mix_hash,
              :nonce,
              :number,
              :parent_hash,
@@ -113,6 +115,7 @@ defmodule ETH.Query.Test do
              :hash,
              :logs_bloom,
              :miner,
+             :mix_hash,
              :nonce,
              :number,
              :parent_hash,
@@ -149,6 +152,7 @@ defmodule ETH.Query.Test do
              :hash,
              :logs_bloom,
              :miner,
+             :mix_hash,
              :nonce,
              :number,
              :parent_hash,
@@ -178,6 +182,7 @@ defmodule ETH.Query.Test do
              :hash,
              :logs_bloom,
              :miner,
+             :mix_hash,
              :nonce,
              :number,
              :parent_hash,
@@ -269,7 +274,7 @@ defmodule ETH.Query.Test do
     address_with_balance = ETH.get_accounts!() |> List.last()
 
     assert ETH.estimate_gas(%{to: address_with_balance, data: ""}) == {:ok, 2.1e4}
-    assert ETH.estimate_gas(%{to: address_with_balance, data: "asd"}) == {:ok, 21340}
+    assert ETH.estimate_gas(%{to: address_with_balance, data: "asd"}) == {:ok, 21016}
   end
 
   test "estimate_gas/2 works with different denomination" do
@@ -281,7 +286,7 @@ defmodule ETH.Query.Test do
     {:ok, second_gas_in_wei} = ETH.estimate_gas(%{to: address, data: "asd"}, :wei)
 
     assert first_gas_in_wei == 21000
-    assert second_gas_in_wei == 21340
+    assert second_gas_in_wei == 21016
 
     first_difference = first_gas_in_ether / second_gas_in_ether
     second_difference = first_gas_in_wei / second_gas_in_wei
@@ -292,7 +297,7 @@ defmodule ETH.Query.Test do
     address_with_balance = ETH.get_accounts!() |> List.last()
 
     assert ETH.estimate_gas!(%{to: address_with_balance, data: ""}) == 2.1e4
-    assert ETH.estimate_gas!(%{to: address_with_balance, data: "asd"}) == 21340
+    assert ETH.estimate_gas!(%{to: address_with_balance, data: "asd"}) == 21016
   end
 
   test "estimate_gas!/2 works with different denomination" do
@@ -304,7 +309,7 @@ defmodule ETH.Query.Test do
     second_gas_in_wei = ETH.estimate_gas!(%{to: address, data: "asd"}, :wei)
 
     assert first_gas_in_wei == 21000
-    assert second_gas_in_wei == 21340
+    assert second_gas_in_wei == 21016
 
     first_difference = first_gas_in_ether / second_gas_in_ether
     second_difference = first_gas_in_wei / second_gas_in_wei

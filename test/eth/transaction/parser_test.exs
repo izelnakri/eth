@@ -1,3 +1,4 @@
+# NOTE: PASSING
 defmodule ETH.Transaction.Parser.Test do
   use ExUnit.Case
   import ETH.Utils

@@ -1,3 +1,4 @@
+# NOTE: PASSING
 # NOTE: bottom half not tested(do it last)
 defmodule ETH.UtilsTest do
   use ExUnit.Case

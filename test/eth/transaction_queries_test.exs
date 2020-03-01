@@ -1,3 +1,4 @@
+# NOTE: FAILING
 defmodule ETH.TransactionQueries.Test do
   use ExUnit.Case
 

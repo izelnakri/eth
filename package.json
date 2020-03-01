@@ -1,0 +1,29 @@
+{
+  "name": "eth",
+  "version": "1.0.0",
+  "description": "[![Hex Version](http://img.shields.io/hexpm/v/eth.svg?style=flat)](https://hex.pm/packages/eth) [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/eth/ETH.html)",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/izelnakri/eth.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/izelnakri/eth/issues"
+  },
+  "homepage": "https://github.com/izelnakri/eth#readme",
+  "devDependencies": {
+    "ganache-cli": "^6.9.1"
+  },
+  "volta": {
+    "node": "8.9.4"
+  }
+}

@@ -1,3 +1,4 @@
+# NOTE: PASSING
 defmodule ETH.ETH.Signer.Test do
   use ExUnit.Case
   import ETH.Utils
