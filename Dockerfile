@@ -5,34 +5,33 @@ ENV MIX_ENV=$MIX_ENV
 
 WORKDIR /code
 
-RUN apt-get update && apt-get -y install curl && curl https://get.volta.sh | bash
+RUN apt-get update && apt-get -y install curl make build-essential && curl https://get.volta.sh | bash
 
 ENV PATH=$PATH:/root/.volta/bin
 
 RUN volta install node@8.9
 
-ADD ["mix.lock", "mix.exs", "/code/"]
+ADD ["package.json", "package-lock.json"]
+
+RUN npm install
+
+ADD ["mix.lock", "mix.exs", "rebar.config", "/code/"]
 
 RUN echo "y" | mix local.hex --if-missing && echo "y" | mix local.rebar --if-missing
 
-RUN mix local.hex --force && mix local.rebar --force && \
-  mix deps.get
-  # && MIX_ENV=test mix deps.compile && \
-  # MIX_ENV=$MIX_ENV mix deps.compile
+RUN mix deps.get && MIX_ENV=test mix deps.compile && \
+  MIX_ENV=$MIX_ENV mix deps.compile && MIX_ENV=prod mix deps.compile
 
 ADD ["config", "lib", "/code/"]
 
-# RUN MIX_ENV=$MIX_ENV mix compile
+RUN MIX_ENV=$MIX_ENV mix compile
 
 ADD ["test", "/code/"]
 
-# RUN MIX_ENV=test mix compile && MIX_ENV=$MIX_ENV mix compile
+RUN MIX_ENV=test mix compile && MIX_ENV=$MIX_ENV mix compile
 
-# ADD . /code/
+ADD . /code/
 
-# RUN MIX_ENV=test mix compile && MIX_ENV=$MIX_ENV mix compile
-
-
-# RUN npm install
+RUN MIX_ENV=test mix compile && MIX_ENV=$MIX_ENV mix compile
 
 CMD ["/bin/bash"]
