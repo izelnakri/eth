@@ -31,7 +31,7 @@ defmodule Eth.Mixfile do
       {:keccakf1600, "~> 2.0", hex: :keccakf1600_orig},
       {:mnemonic, "~> 0.2.1"},
       {:poison, "~> 3.1"},
-      {:libsecp256k1, "~> 0.1.3"}
+      {:libsecp256k1, "~> 0.1.10"}
     ]
   end
 

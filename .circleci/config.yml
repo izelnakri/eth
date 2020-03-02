@@ -1,34 +1,45 @@
-# Elixir CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-elixir/ for more details
 version: 2
 jobs:
   build:
     docker:
-      # specify the version here
-      - image: elixir:1.6
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
+      - image: docker:stable-git
+    working_directory: /code
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-          name: Install node@7.10.1
+          name: Build application Docker image
           command: |
-            set +e
-            touch $BASH_ENV
-            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.5/install.sh | bash
-            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
-            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
-            echo 'nvm install v7.10.1' >> $BASH_ENV
-            echo 'nvm alias default 7.10.1' >> $BASH_ENV
-      - run: node -v
-      - run: npm install -g ganache-cli
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
-      - run: mix test --seed 0
+            docker build -t eth .
+      - deploy:
+          name: Push application Docker image
+          command: |
+            DOCKER_TAG=$(echo eth:${CIRCLE_BRANCH} | tr '/' '_')
+            DOCKER_TARGET_REMOTE="${HUB_USERNAME}/${DOCKER_TAG}"
+            echo $HUB_KEY | docker login -u $HUB_USERNAME --password-stdin
+            docker tag eth "${DOCKER_TARGET_REMOTE}"
+            docker push "${DOCKER_TARGET_REMOTE}"
+  test:
+    docker:
+      - image: docker:stable-git
+    working_directory: ~/code
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Pull and run a docker container
+          command: |
+            DOCKER_TAG=$(echo eth:${CIRCLE_BRANCH} | tr '/' '_')
+            docker pull ${HUB_USERNAME}/${DOCKER_TAG}
+            docker run -t -d --name="eth" ${HUB_USERNAME}/${DOCKER_TAG} /bin/sh
+      - run: docker exec -it eth mix test
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+
+# https://circleci.com/blog/how-to-build-a-docker-image-on-circleci-2-0/
