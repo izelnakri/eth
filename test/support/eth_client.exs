@@ -6,7 +6,7 @@ defmodule ETH.TestClient do
       |> :os.cmd()
     end)
 
-    Process.sleep(4100)
+    Process.sleep(4000)
   end
 
   def stop do
