@@ -67,6 +67,12 @@ defmodule ETH.Transaction.Builder do
     value = Keyword.get(params, :value, 0)
     gas_price = Keyword.get(params, :gas_price, ETH.gas_price!())
     data = Keyword.get(params, :data, "")
+
+    target_data =
+      if data !== "" && !String.starts_with?(data, "0x"),
+        do: "0x" <> Hexate.encode(data),
+        else: data
+
     nonce = Keyword.get(params, :nonce, generate_nonce(Keyword.get(params, :from)))
     chain_id = Keyword.get(params, :chain_id, 3)
 
@@ -77,13 +83,20 @@ defmodule ETH.Transaction.Builder do
         ETH.estimate_gas!(%{
           to: to,
           value: value,
-          data: data,
+          data: target_data,
           nonce: nonce,
           chain_id: chain_id
         })
       )
 
-    %{nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data}
+    %{
+      nonce: nonce,
+      gas_price: gas_price,
+      gas_limit: gas_limit,
+      to: to,
+      value: value,
+      data: target_data
+    }
   end
 
   defp build_params_from_map(params) do
@@ -91,6 +104,12 @@ defmodule ETH.Transaction.Builder do
     value = Map.get(params, :value, 0)
     gas_price = Map.get(params, :gas_price, ETH.gas_price!())
     data = Map.get(params, :data, "")
+
+    target_data =
+      if data !== "" && !String.starts_with?(data, "0x"),
+        do: "0x" <> Hexate.encode(data),
+        else: data
+
     nonce = Map.get(params, :nonce, generate_nonce(Map.get(params, :from)))
     chain_id = Map.get(params, :chain_id, 3)
 
@@ -101,13 +120,20 @@ defmodule ETH.Transaction.Builder do
         ETH.estimate_gas!(%{
           to: to,
           value: value,
-          data: data,
+          data: target_data,
           nonce: nonce,
           chain_id: chain_id
         })
       )
 
-    %{nonce: nonce, gas_price: gas_price, gas_limit: gas_limit, to: to, value: value, data: data}
+    %{
+      nonce: nonce,
+      gas_price: gas_price,
+      gas_limit: gas_limit,
+      to: to,
+      value: value,
+      data: target_data
+    }
   end
 
   defp generate_nonce(nil), do: 0

@@ -9,7 +9,7 @@ RUN apt-get update && apt-get -y install curl make build-essential && curl https
 
 ENV PATH=$PATH:/root/.volta/bin
 
-RUN volta install node@8.9
+RUN volta install node@8.17
 
 ADD ["package.json", "package-lock.json"]
 

@@ -48,7 +48,8 @@ defmodule ETH.Transaction do
     |> send_transaction(sender_wallet.private_key)
   end
 
-  def send_transaction(sender_wallet, receiver_wallet, value, private_key) when is_number(value) do
+  def send_transaction(sender_wallet, receiver_wallet, value, private_key)
+      when is_number(value) do
     %{from: sender_wallet.eth_address, to: receiver_wallet.eth_address, value: value}
     |> send_transaction(private_key)
   end
@@ -59,7 +60,8 @@ defmodule ETH.Transaction do
     |> send_transaction(private_key)
   end
 
-  def send_transaction(sender_wallet, receiver_wallet, params, private_key) when is_list(params) do
+  def send_transaction(sender_wallet, receiver_wallet, params, private_key)
+      when is_list(params) do
     params
     |> Keyword.merge(from: sender_wallet.eth_address, to: receiver_wallet.eth_address)
     |> send_transaction(private_key)
@@ -116,7 +118,8 @@ defmodule ETH.Transaction do
     tx_hash
   end
 
-  def send_transaction!(sender_wallet, receiver_wallet, value, private_key) when is_number(value) do
+  def send_transaction!(sender_wallet, receiver_wallet, value, private_key)
+      when is_number(value) do
     {:ok, tx_hash} =
       %{from: sender_wallet.eth_address, to: receiver_wallet.eth_address, value: value}
       |> send_transaction(private_key)
@@ -124,7 +127,8 @@ defmodule ETH.Transaction do
     tx_hash
   end
 
-  def send_transaction!(sender_wallet, receiver_wallet, params, private_key) when is_map(params) do
+  def send_transaction!(sender_wallet, receiver_wallet, params, private_key)
+      when is_map(params) do
     {:ok, tx_hash} =
       params
       |> Map.merge(%{from: sender_wallet.eth_address, to: receiver_wallet.eth_address})
@@ -133,7 +137,8 @@ defmodule ETH.Transaction do
     tx_hash
   end
 
-  def send_transaction!(sender_wallet, receiver_wallet, params, private_key) when is_list(params) do
+  def send_transaction!(sender_wallet, receiver_wallet, params, private_key)
+      when is_list(params) do
     {:ok, tx_hash} =
       params
       |> Keyword.merge(from: sender_wallet.eth_address, to: receiver_wallet.eth_address)

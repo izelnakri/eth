@@ -19,14 +19,14 @@ defmodule ETH.TransactionQueries do
 
   def get_block_transaction_count(block_number) when is_number(block_number) do
     case HttpClient.eth_get_block_transaction_count_by_number(block_number) do
-      {:ok, transaction_count} -> {:ok, transaction_count}
+      {:ok, transaction_count} -> {:ok, convert_to_number(transaction_count)}
       error -> error
     end
   end
 
   def get_block_transaction_count(block_hash) do
     case HttpClient.eth_get_block_transaction_count_by_hash(block_hash) do
-      {:ok, transaction_count} -> {:ok, transaction_count}
+      {:ok, transaction_count} -> {:ok, convert_to_number(transaction_count)}
       error -> error
     end
   end
@@ -34,13 +34,13 @@ defmodule ETH.TransactionQueries do
   def get_block_transaction_count!(block_number) when is_number(block_number) do
     {:ok, transaction_count} = HttpClient.eth_get_block_transaction_count_by_number(block_number)
 
-    transaction_count
+    convert_to_number(transaction_count)
   end
 
   def get_block_transaction_count!(block_hash) do
     {:ok, transaction_count} = HttpClient.eth_get_block_transaction_count_by_hash(block_hash)
 
-    transaction_count
+    convert_to_number(transaction_count)
   end
 
   def get_transaction_from_block(block_number, index) when is_number(block_number) do
@@ -85,7 +85,9 @@ defmodule ETH.TransactionQueries do
 
   def get_transaction_receipt(transaction_hash) do
     case HttpClient.eth_get_transaction_receipt(transaction_hash) do
-      {:ok, nil} -> {:error, nil}
+      {:ok, nil} ->
+        {:error, nil}
+
       {:ok, raw_transaction_receipt} ->
         {:ok, convert_transaction_receipt(raw_transaction_receipt)}
 

@@ -125,7 +125,8 @@ defmodule ETH.Transaction.Parser.Test do
            }
 
     assert Transaction.parse(
-             @not_signed_transaction_map |> Map.keys()
+             @not_signed_transaction_map
+             |> Map.keys()
              |> Enum.reduce(%{}, fn key, acc ->
                Map.put(acc, key, to_buffer(Map.get(@not_signed_transaction_map, key)))
              end)
@@ -153,7 +154,8 @@ defmodule ETH.Transaction.Parser.Test do
            }
 
     assert Transaction.parse(
-             @signed_transaction_map |> Map.keys()
+             @signed_transaction_map
+             |> Map.keys()
              |> Enum.reduce(%{}, fn key, acc ->
                Map.put(acc, key, to_buffer(Map.get(@signed_transaction_map, key)))
              end)
@@ -198,7 +200,8 @@ defmodule ETH.Transaction.Parser.Test do
            ]
 
     assert Transaction.to_list(
-             @signed_transaction_map |> Map.keys()
+             @signed_transaction_map
+             |> Map.keys()
              |> Enum.reduce(%{}, fn key, acc ->
                Map.put(acc, key, to_buffer(Map.get(@signed_transaction_map, key)))
              end)
@@ -229,7 +232,8 @@ defmodule ETH.Transaction.Parser.Test do
            ]
 
     assert Transaction.to_list(
-             @not_signed_transaction_map |> Map.keys()
+             @not_signed_transaction_map
+             |> Map.keys()
              |> Enum.reduce(%{}, fn key, acc ->
                Map.put(acc, key, to_buffer(Map.get(@not_signed_transaction_map, key)))
              end)

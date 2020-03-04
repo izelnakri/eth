@@ -22,7 +22,6 @@ defmodule ETHTest do
   #   chain_id: 3 # EIP 155 chainId - mainnet: 1, ropsten: 3
   # }
 
-
   # test "hash/1 works" do
   #   target_hash = "5C207A650B59A8C2D1271F5CBDA78A658CB411A87271D68062E61AB1A3F85CF9"
   #   assert ETH.Transaction.hash_transaction(@first_transaction_list) |> Base.encode16 == target_hash

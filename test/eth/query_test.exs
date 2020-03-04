@@ -100,6 +100,8 @@ defmodule ETH.Query.Test do
   end
 
   test "get_block/1 by number works" do
+    ETH.TestClient.advance_block_by(1)
+
     target_result = ETH.get_block(2)
     target_block = target_result |> elem(1)
 
@@ -169,6 +171,8 @@ defmodule ETH.Query.Test do
   end
 
   test "get_block!/1 by number works" do
+    ETH.TestClient.advance_block_by(1)
+
     target_block = ETH.get_block!(2)
 
     assert target_block.number == 2
@@ -199,6 +203,8 @@ defmodule ETH.Query.Test do
   end
 
   test "get_block!/1 by hash works" do
+    ETH.TestClient.advance_block_by(1)
+
     first_block = ETH.get_block!(1)
     second_block = ETH.get_block!(2)
 
@@ -313,6 +319,7 @@ defmodule ETH.Query.Test do
 
     first_difference = first_gas_in_ether / second_gas_in_ether
     second_difference = first_gas_in_wei / second_gas_in_wei
+
     assert Float.floor(first_difference, 15) == Float.floor(second_difference, 15)
   end
 end

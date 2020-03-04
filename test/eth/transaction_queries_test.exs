@@ -1,4 +1,3 @@
-# NOTE: FAILING
 defmodule ETH.TransactionQueries.Test do
   use ExUnit.Case
 
@@ -72,9 +71,9 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    assert ETH.get_block_transactions(ETH.block_number!() - 1) ==
+    assert ETH.get_block_transactions(ETH.block_number!()) ==
              {:ok,
               [
                 ETH.get_transaction!(first_tx_hash),
@@ -92,9 +91,9 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    target_block = ETH.get_block!(ETH.block_number!() - 1)
+    target_block = ETH.get_block!(ETH.block_number!())
 
     assert ETH.get_block_transactions(target_block.hash) ==
              {:ok,
@@ -112,9 +111,9 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    assert ETH.get_block_transactions!(ETH.block_number!() - 1) == [
+    assert ETH.get_block_transactions!(ETH.block_number!()) == [
              ETH.get_transaction!(first_tx_hash),
              ETH.get_transaction!(second_tx_hash)
            ]
@@ -128,9 +127,9 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    target_block = ETH.get_block!(ETH.block_number!() - 1)
+    target_block = ETH.get_block!(ETH.block_number!())
 
     assert ETH.get_block_transactions!(target_block.hash) == [
              ETH.get_transaction!(first_tx_hash),
@@ -144,9 +143,9 @@ defmodule ETH.TransactionQueries.Test do
     ETH.send_transaction!(@first_wallet_in_client, @second_wallet_in_client, 500)
     ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    assert ETH.get_block_transaction_count(ETH.block_number!() - 1) == {:ok, 2}
+    assert ETH.get_block_transaction_count(ETH.block_number!()) == {:ok, 2}
   end
 
   test "get_block_transaction_count!(block_number)" do
@@ -155,9 +154,9 @@ defmodule ETH.TransactionQueries.Test do
     ETH.send_transaction!(@first_wallet_in_client, @second_wallet_in_client, 500)
     ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    assert ETH.get_block_transaction_count!(ETH.block_number!() - 1) == 2
+    assert ETH.get_block_transaction_count!(ETH.block_number!()) == 2
   end
 
   test "get_block_transaction_count(block_hash) works" do
@@ -166,9 +165,9 @@ defmodule ETH.TransactionQueries.Test do
     ETH.send_transaction!(@first_wallet_in_client, @second_wallet_in_client, 500)
     ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    target_block = ETH.get_block!(ETH.block_number!() - 1)
+    target_block = ETH.get_block!(ETH.block_number!())
 
     assert ETH.get_block_transaction_count(target_block.hash) == {:ok, 2}
   end
@@ -179,9 +178,9 @@ defmodule ETH.TransactionQueries.Test do
     ETH.send_transaction!(@first_wallet_in_client, @second_wallet_in_client, 500)
     ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    target_block = ETH.get_block!(ETH.block_number!() - 1)
+    target_block = ETH.get_block!(ETH.block_number!())
 
     assert ETH.get_block_transaction_count!(target_block.hash) == 2
   end
@@ -194,9 +193,9 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    block_no = ETH.block_number!() - 1
+    block_no = ETH.block_number!()
 
     assert ETH.get_transaction_from_block(block_no, 0) ==
              {:ok, ETH.get_transaction!(first_tx_hash)}
@@ -215,9 +214,9 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    block_no = ETH.block_number!() - 1
+    block_no = ETH.block_number!()
 
     assert ETH.get_transaction_from_block!(block_no, 0) == ETH.get_transaction!(first_tx_hash)
     assert ETH.get_transaction_from_block!(block_no, 1) == ETH.get_transaction!(second_tx_hash)
@@ -233,9 +232,9 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    block_hash = ETH.get_block!(ETH.block_number!() - 1).hash
+    block_hash = ETH.get_block!(ETH.block_number!()).hash
 
     assert ETH.get_transaction_from_block(block_hash, 0) ==
              {:ok, ETH.get_transaction!(first_tx_hash)}
@@ -256,9 +255,9 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
-    block_hash = ETH.get_block!(ETH.block_number!() - 1).hash
+    block_hash = ETH.get_block!(ETH.block_number!()).hash
 
     assert ETH.get_transaction_from_block!(block_hash, 0) == ETH.get_transaction!(first_tx_hash)
     assert ETH.get_transaction_from_block!(block_hash, 1) == ETH.get_transaction!(second_tx_hash)
@@ -271,7 +270,7 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     {:ok, first_transaction} = ETH.get_transaction(first_tx_hash)
     {:ok, second_transaction} = ETH.get_transaction(second_tx_hash)
@@ -285,8 +284,11 @@ defmodule ETH.TransactionQueries.Test do
              :hash,
              :input,
              :nonce,
+             :r,
+             :s,
              :to,
              :transaction_index,
+             :v,
              :value
            ]
 
@@ -301,8 +303,11 @@ defmodule ETH.TransactionQueries.Test do
              :hash,
              :input,
              :nonce,
+             :r,
+             :s,
              :to,
              :transaction_index,
+             :v,
              :value
            ]
 
@@ -315,7 +320,7 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     first_transaction = ETH.get_transaction!(first_tx_hash)
     second_transaction = ETH.get_transaction!(second_tx_hash)
@@ -329,8 +334,11 @@ defmodule ETH.TransactionQueries.Test do
              :hash,
              :input,
              :nonce,
+             :r,
+             :s,
              :to,
              :transaction_index,
+             :v,
              :value
            ]
 
@@ -345,8 +353,11 @@ defmodule ETH.TransactionQueries.Test do
              :hash,
              :input,
              :nonce,
+             :r,
+             :s,
              :to,
              :transaction_index,
+             :v,
              :value
            ]
 
@@ -359,7 +370,7 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     {:ok, first_transaction_receipt} = ETH.get_transaction_receipt(first_tx_hash)
     {:ok, second_transaction_receipt} = ETH.get_transaction_receipt(second_tx_hash)
@@ -369,9 +380,12 @@ defmodule ETH.TransactionQueries.Test do
              :block_number,
              :contract_address,
              :cumulative_gas_used,
+             :from,
              :gas_used,
              :logs,
+             :logs_bloom,
              :status,
+             :to,
              :transaction_hash,
              :transaction_index
            ]
@@ -383,9 +397,12 @@ defmodule ETH.TransactionQueries.Test do
              :block_number,
              :contract_address,
              :cumulative_gas_used,
+             :from,
              :gas_used,
              :logs,
+             :logs_bloom,
              :status,
+             :to,
              :transaction_hash,
              :transaction_index
            ]
@@ -399,7 +416,7 @@ defmodule ETH.TransactionQueries.Test do
     second_tx_hash =
       ETH.send_transaction!(@second_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     first_transaction_receipt = ETH.get_transaction_receipt!(first_tx_hash)
     second_transaction_receipt = ETH.get_transaction_receipt!(second_tx_hash)
@@ -409,9 +426,12 @@ defmodule ETH.TransactionQueries.Test do
              :block_number,
              :contract_address,
              :cumulative_gas_used,
+             :from,
              :gas_used,
              :logs,
+             :logs_bloom,
              :status,
+             :to,
              :transaction_hash,
              :transaction_index
            ]
@@ -423,9 +443,12 @@ defmodule ETH.TransactionQueries.Test do
              :block_number,
              :contract_address,
              :cumulative_gas_used,
+             :from,
              :gas_used,
              :logs,
+             :logs_bloom,
              :status,
+             :to,
              :transaction_hash,
              :transaction_index
            ]
@@ -438,11 +461,11 @@ defmodule ETH.TransactionQueries.Test do
 
     ETH.send_transaction!(@third_wallet_in_client, @second_wallet_in_client, 500)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     ETH.send_transaction!(@third_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     assert ETH.get_transaction_count(@third_wallet_in_client, "latest") == {:ok, 2}
   end
@@ -452,11 +475,11 @@ defmodule ETH.TransactionQueries.Test do
 
     ETH.send_transaction!(@fourth_wallet_in_client, @second_wallet_in_client, 500)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     ETH.send_transaction!(@fourth_wallet_in_client, @first_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     assert ETH.get_transaction_count!(@fourth_wallet_in_client, "latest") == 2
   end
@@ -466,11 +489,11 @@ defmodule ETH.TransactionQueries.Test do
 
     ETH.send_transaction!(@fifth_wallet_in_client, @second_wallet_in_client, 500)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     ETH.send_transaction!(@fifth_wallet_in_client, @third_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     assert ETH.get_transaction_count(@fifth_wallet_in_client.eth_address) == {:ok, 2}
   end
@@ -480,11 +503,11 @@ defmodule ETH.TransactionQueries.Test do
 
     ETH.send_transaction!(@sixth_wallet_in_client, @second_wallet_in_client, 500)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     ETH.send_transaction!(@sixth_wallet_in_client, @third_wallet_in_client, 2000)
 
-    Process.sleep(2000)
+    ETH.TestClient.advance_block_by(1)
 
     assert ETH.get_transaction_count!(@sixth_wallet_in_client.eth_address) == 2
   end
