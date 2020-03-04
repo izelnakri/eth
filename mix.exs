@@ -1,7 +1,7 @@
 defmodule Eth.Mixfile do
   use Mix.Project
 
-  def project do
+  def project() do
     [
       app: :eth,
       version: "0.4.0",
@@ -14,14 +14,14 @@ defmodule Eth.Mixfile do
   end
 
   # Run "mix help compile.app" to learn about applications.
-  def application do
+  def application() do
     [
       extra_applications: [:logger, :ethereumex, :libsecp256k1]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
-  defp deps do
+  defp deps() do
     [
       {:ethereumex, "~> 0.5.6"},
       {:ex_rlp, "~> 0.5.3"},
@@ -35,13 +35,13 @@ defmodule Eth.Mixfile do
     ]
   end
 
-  defp description do
+  defp description() do
     """
     Ethereum utilities for Elixir.
     """
   end
 
-  def package do
+  def package() do
     [
       name: :eth,
       files: ["lib", "mix.exs", "README*", "LICENSE*"],
