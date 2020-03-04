@@ -5,7 +5,8 @@ ENV MIX_ENV=$MIX_ENV
 
 WORKDIR /code
 
-RUN apt-get update && apt-get -y install autoconf git curl make build-essential && curl https://get.volta.sh | bash
+RUN apt-get update && apt-get -y install procps autoconf libtool libgmp3-dev git curl make build-essential && \
+  curl https://get.volta.sh | bash
 
 ENV PATH=$PATH:/root/.volta/bin
 
