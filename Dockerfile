@@ -5,14 +5,14 @@ ENV MIX_ENV=$MIX_ENV
 
 WORKDIR /code
 
-RUN apt-get update && apt-get -y install procps autoconf libtool libgmp3-dev git curl make build-essential && \
+RUN apt-get update && apt-get -y install python procps autoconf libtool libgmp3-dev git curl make build-essential && \
   curl https://get.volta.sh | bash
 
 ENV PATH=$PATH:/root/.volta/bin
 
 RUN volta install node@8.17
 
-ADD ["package.json", "package-lock.json"]
+ADD ["package.json", "package-lock.json", "/code/"]
 
 RUN npm install
 

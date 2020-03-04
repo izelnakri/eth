@@ -10,10 +10,8 @@ defmodule ETH.TestClient do
       # this makes the process hang, maybe with elixir ports we can intercept?
     end)
 
-    wait_until_the_port_is_open()
+    wait_until_the_port_is_open() # NOTE: since couldnt find a way to intercept the testrpc init no way to know when test blockchain actually starts
     advance_block_by(1)
-
-    # Process.sleep(4000 + @block_time) # NOTE: since couldnt find a way to intercept the testrpc init no way to know when test blockchain actually starts
   end
 
   def stop do
@@ -28,7 +26,6 @@ defmodule ETH.TestClient do
     wait_until_next_block(block_no_during_function_call)
 
     if block_count > 1 do
-      # NOTE: it was 50 kind , isthis is needed probably because JS timers/setInterval etc are problematic?
       Process.sleep(block_count * @block_time - @block_time)
     end
   end
