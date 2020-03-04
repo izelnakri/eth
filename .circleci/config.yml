@@ -30,8 +30,8 @@ jobs:
           command: |
             DOCKER_TAG=$(echo eth:${CIRCLE_BRANCH} | tr '/' '_')
             docker pull ${HUB_USERNAME}/${DOCKER_TAG}
-            docker run -t -d --name="eth" ${HUB_USERNAME}/${DOCKER_TAG} /bin/sh
-      - run: docker exec -it eth mix test test --seed 0 --trace
+            docker run -t -d --name="eth" ${HUB_USERNAME}/${DOCKER_TAG} /bin/bash
+      - run: docker exec -it eth mix test --seed 0 --trace
 
 workflows:
   version: 2
