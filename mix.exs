@@ -26,7 +26,7 @@ defmodule Eth.Mixfile do
       {:ethereumex, "~> 0.6.0"},
       {:ex_rlp, "~> 0.5.3"},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:dialyxir, "~> 0.5.1", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
       {:hexate, "~> 0.6.1"},
       {:keccakf1600, "~> 2.0", hex: :keccakf1600_orig},
       {:mnemonic, "~> 0.2.1"},
