@@ -124,7 +124,10 @@ defmodule ETH.Transaction.Signer do
 
     sig_v = if chain_id > 0, do: initial_v + (chain_id * 2 + 8), else: initial_v
 
-    [nonce, gas_price, gas_limit, to, value, data, <<sig_v>>, sig_r, sig_s]
+    [nonce, gas_price, gas_limit, to, value, data, <<sig_v>>, trim_leading_zero(sig_r), trim_leading_zero(sig_s)]
     |> ExRLP.encode()
   end
+
+  defp trim_leading_zero(<<0>> <> r_or_s), do: r_or_s
+  defp trim_leading_zero(r_or_s), do: r_or_s
 end
