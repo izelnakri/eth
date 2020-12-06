@@ -1,7 +1,7 @@
 defmodule Eth.Mixfile do
   use Mix.Project
 
-  @version "0.5.1"
+  @version "0.5.2"
   @source_url "https://github.com/izelnakri/eth"
 
   def project() do
