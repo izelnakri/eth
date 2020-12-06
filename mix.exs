@@ -1,15 +1,19 @@
 defmodule Eth.Mixfile do
   use Mix.Project
 
+  @version "0.5.0"
+  @source_url "https://github.com/izelnakri/eth"
+
   def project() do
     [
       app: :eth,
-      version: "0.5.0",
+      version: @version,
       elixir: "~> 1.6",
+      description: description(),
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
       package: package(),
-      description: description()
+      deps: deps(),
+      docs: docs()
     ]
   end
 
@@ -49,9 +53,22 @@ defmodule Eth.Mixfile do
       maintainers: ["Izel Nakri"],
       licenses: ["MIT License"],
       links: %{
-        "GitHub" => "https://github.com/izelnakri/eth",
-        "Docs" => "https://hexdocs.pm/eth/ETH.html"
+        "Changelog" => "#{@source_url}/blob/master/CHANGELOG.md",
+        "Docs" => "https://hexdocs.pm/eth/ETH.html",
+        "GitHub" => @source_url
       }
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: @source_url,
+      extras: [
+        "README.md",
+        "CHANGELOG.md"
+      ]
     ]
   end
 end
