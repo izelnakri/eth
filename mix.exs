@@ -32,7 +32,7 @@ defmodule Eth.Mixfile do
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
       {:hexate, "~> 0.6.1"},
-      {:keccakf1600, "~> 2.0", hex: :keccakf1600_orig},
+      {:ex_keccak, "~> 0.1.2"},
       {:mnemonic, "~> 0.2.1"},
       {:poison, "~> 4.0.1"},
       {:libsecp256k1, "~> 0.1.10"},
