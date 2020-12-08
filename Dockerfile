@@ -8,7 +8,9 @@ WORKDIR /code
 RUN apt-get update && apt-get -y install python procps autoconf libtool libgmp3-dev git curl make build-essential && \
   curl https://get.volta.sh | bash
 
-ENV PATH=$PATH:/root/.volta/bin
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+
+ENV PATH=$PATH:/root/.volta/bin:/root/.cargo/bin
 
 RUN volta install node@8.17
 
@@ -16,7 +18,7 @@ ADD ["package.json", "package-lock.json", "/code/"]
 
 RUN npm install
 
-ADD ["mix.lock", "mix.exs", "rebar.config", "/code/"]
+ADD ["mix.lock", "mix.exs", "/code/"]
 
 RUN echo "y" | mix local.hex --if-missing && echo "y" | mix local.rebar --if-missing
 
