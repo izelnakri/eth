@@ -20,7 +20,7 @@ defmodule Eth.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application() do
     [
-      extra_applications: [:logger, :telemetry, :ethereumex, :libsecp256k1]
+      extra_applications: [:logger, :telemetry, :ethereumex]
     ]
   end
 
@@ -35,7 +35,7 @@ defmodule Eth.Mixfile do
       {:ex_keccak, "~> 0.1.2"},
       {:mnemonic, "~> 0.2.2"},
       {:poison, "~> 4.0.1"},
-      {:libsecp256k1, "~> 0.1.10"},
+      {:ex_secp256k1, "~> 0.1.2"},
       {:telemetry, "~> 0.4.2"}
     ]
   end

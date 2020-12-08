@@ -177,12 +177,9 @@ defmodule ETH.Transaction do
     chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
     v_int = buffer_to_int(v)
     target_v = if chain_id > 0, do: v_int - (chain_id * 2 + 8), else: v_int
-
-    signature = r <> s
     recovery_id = target_v - 27
 
-    {:ok, public_key} =
-      :libsecp256k1.ecdsa_recover_compact(message_hash, signature, :uncompressed, recovery_id)
+    {:ok, public_key} = ExSecp256k1.recover_compact(message_hash, r <> s, recovery_id)
 
     public_key
   end
