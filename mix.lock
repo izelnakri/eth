@@ -21,7 +21,7 @@
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], [], "hexpm", "69b09adddc4f74a40716ae54d140f93beb0fb8978d8636eaded0c31b6f099f16"},
   "mimerl": {:hex, :mimerl, "1.2.0", "67e2d3f571088d5cfd3e550c383094b47159f3eee8ffa08e64106cdf5e981be3", [:rebar3], [], "hexpm", "f278585650aa581986264638ebf698f8bb19df297f66ad91b18910dfc6e19323"},
   "mix_erlang_tasks": {:hex, :mix_erlang_tasks, "0.1.0", "36819fec60b80689eb1380938675af215565a89320a9e29c72c70d97512e4649", [:mix], [], "hexpm", "95d2839c422c482a70c08a8702da8242f86b773f8ab6e8602a4eb72da8da04ed"},
-  "mnemonic": {:hex, :mnemonic, "0.2.2", "cb232a604ca5e8a25fb81aae15b2828eabfeaa07483314e7ed8f97c33f4daf7e", [:mix], [], "hexpm", "ca4d05bb51f9f1fa2658cdf0d1b450430380eb0f3b9964511e2abffc77f3d940"},
+  "mnemonic": {:hex, :mnemonic, "0.2.5", "c5cbbef2ab55e03e54b69a19109b16fad970c78ef18ef090d14724d16dd8fd6a", [:mix], [], "hexpm", "84ff26c4d55b6581ea092d04cb7a7a35c24ae00825c93a1ceafa44670c426c13"},
   "nimble_parsec": {:hex, :nimble_parsec, "1.1.0", "3a6fca1550363552e54c216debb6a9e95bd8d32348938e13de5eda962c0d7f89", [:mix], [], "hexpm", "08eb32d66b706e913ff748f11694b17981c0b04a33ef470e33e11b3d3ac8f54b"},
   "parse_trans": {:hex, :parse_trans, "3.3.0", "09765507a3c7590a784615cfd421d101aec25098d50b89d7aa1d66646bc571c1", [:rebar3], [], "hexpm", "17ef63abde837ad30680ea7f857dd9e7ced9476cdd7b0394432af4bfc241b960"},
   "poison": {:hex, :poison, "4.0.1", "bcb755a16fac91cad79bfe9fc3585bb07b9331e50cfe3420a24bcc2d735709ae", [:mix], [], "hexpm", "ba8836feea4b394bb718a161fc59a288fe0109b5006d6bdf97b6badfcf6f0f25"},
