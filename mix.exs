@@ -27,7 +27,7 @@ defmodule Eth.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps() do
     [
-      {:ethereumex, "~> 0.6.0"},
+      {:ethereumex, "~> 0.7.0"},
       {:ex_rlp, "~> 0.5.3"},
       {:ex_doc, ">= 0.23.0", only: :dev},
       {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
