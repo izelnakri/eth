@@ -32,10 +32,10 @@ defmodule Eth.Mixfile do
       {:ex_doc, ">= 0.23.0", only: :dev},
       {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
       {:hexate, "~> 0.6.1"},
-      {:ex_keccak, "~> 0.1.2"},
+      {:ex_keccak, "~> 0.2.0"},
       {:mnemonic, "~> 0.2.2"},
       {:poison, "~> 5.0.0"},
-      {:ex_secp256k1, "~> 0.1.2"},
+      {:ex_secp256k1, "~> 0.2.0"},
       {:telemetry, "~> 0.4.2"}
     ]
   end
