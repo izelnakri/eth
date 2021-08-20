@@ -65,8 +65,7 @@ defmodule ETH.Utils do
   end
 
   def keccak256(data) do
-    {:ok, result} = ExKeccak.hash_256(data)
-    result
+    ExKeccak.hash_256(data)
   end
 
   def encode16(value), do: Base.encode16(value, case: :lower)
