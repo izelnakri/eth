@@ -35,7 +35,7 @@ defmodule Eth.Mixfile do
       {:ex_keccak, "~> 0.2.0"},
       {:mnemonic, "~> 0.2.2"},
       {:poison, "~> 5.0.0"},
-      {:ex_secp256k1, "~> 0.2.0"},
+      {:ex_secp256k1, github: "stevelacy/ex_secp256k1"},
       {:telemetry, "~> 0.4.2"}
     ]
   end
