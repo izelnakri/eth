@@ -19,10 +19,10 @@
     "release": "node_modules/.bin/release-it --no-npm.publish && MIX_ENV=dev mix hex.publish --yes"
   },
   "devDependencies": {
-    "@j-ulrich/release-it-regex-bumper": "^1.2.0",
-    "auto-changelog": "^2.2.1",
-    "ganache-cli": "6.12.1",
-    "release-it": "^14.2.2"
+    "@j-ulrich/release-it-regex-bumper": "^2.0.0",
+    "auto-changelog": "^2.3.0",
+    "ganache-cli": "6.12.2",
+    "release-it": "^14.11.5"
   },
   "release-it": {
     "plugins": {
