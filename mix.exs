@@ -8,7 +8,7 @@ defmodule Eth.Mixfile do
     [
       app: :eth,
       version: @version,
-      elixir: "~> 1.11",
+      elixir: "~> 1.12",
       description: description(),
       start_permanent: Mix.env() == :prod,
       package: package(),

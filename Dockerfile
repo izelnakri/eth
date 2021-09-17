@@ -1,4 +1,4 @@
-FROM "elixir:1.11.2-slim"
+FROM "elixir:1.12.3-slim"
 
 ARG MIX_ENV=dev
 ENV MIX_ENV=$MIX_ENV
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get -y install cargo python procps autoconf libtool li
 
 ENV PATH=$PATH:/root/.volta/bin
 
-RUN volta install node@8.17
+RUN volta install node@16.9
 
 ADD ["package.json", "package-lock.json", "/code/"]
 
