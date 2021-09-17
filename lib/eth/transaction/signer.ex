@@ -34,7 +34,7 @@ defmodule ETH.Transaction.Signer do
 
     target_list
     |> ExRLP.encode()
-    |> keccak256
+    |> ExKeccak.hash_256
   end
 
   def hash_transaction(

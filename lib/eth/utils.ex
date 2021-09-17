@@ -14,25 +14,25 @@ defmodule ETH.Utils do
 
   def get_address(<<private_key::binary-size(32)>>) do
     <<4::size(8), key::binary-size(64)>> = private_key |> get_public_key()
-    <<_::binary-size(12), eth_address::binary-size(20)>> = keccak256(key)
+    <<_::binary-size(12), eth_address::binary-size(20)>> = ExKeccak.hash_256(key)
     "0x#{Base.encode16(eth_address)}"
   end
 
   def get_address(<<encoded_private_key::binary-size(64)>>) do
     public_key = Base.decode16!(encoded_private_key, case: :mixed) |> get_public_key()
     <<4::size(8), key::binary-size(64)>> = public_key
-    <<_::binary-size(12), eth_address::binary-size(20)>> = keccak256(key)
+    <<_::binary-size(12), eth_address::binary-size(20)>> = ExKeccak.hash_256(key)
     "0x#{Base.encode16(eth_address)}"
   end
 
   def get_address(<<4::size(8), key::binary-size(64)>>) do
-    <<_::binary-size(12), eth_address::binary-size(20)>> = keccak256(key)
+    <<_::binary-size(12), eth_address::binary-size(20)>> = ExKeccak.hash_256(key)
     "0x#{Base.encode16(eth_address)}"
   end
 
   def get_address(<<encoded_public_key::binary-size(130)>>) do
     <<4::size(8), key::binary-size(64)>> = Base.decode16!(encoded_public_key, case: :mixed)
-    <<_::binary-size(12), eth_address::binary-size(20)>> = keccak256(key)
+    <<_::binary-size(12), eth_address::binary-size(20)>> = ExKeccak.hash_256(key)
     "0x#{Base.encode16(eth_address)}"
   end
 
@@ -62,11 +62,6 @@ defmodule ETH.Utils do
     {:ok, {signature, recovery}} = ExSecp256k1.sign_compact(hash, private_key)
 
     [signature: signature, recovery: recovery]
-  end
-
-  def keccak256(data) do
-    {:ok, result} = ExKeccak.hash_256(data)
-    result
   end
 
   def encode16(value), do: Base.encode16(value, case: :lower)

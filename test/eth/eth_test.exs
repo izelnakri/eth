@@ -59,7 +59,6 @@ defmodule ETH.Test do
              get_transaction_receipt!: 1,
              hash_transaction: 1,
              hash_transaction: 2,
-             keccak256: 1,
              pad_to_even: 1,
              parse: 1,
              secp256k1_signature: 2,

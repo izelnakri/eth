@@ -97,7 +97,6 @@ defmodule ETH do
   defdelegate get_address(private_or_public_key), to: ETH.Utils
   defdelegate convert(value, denomination), to: ETH.Utils
   defdelegate secp256k1_signature(hash, private_key), to: ETH.Utils
-  defdelegate keccak256(data), to: ETH.Utils
   defdelegate encode16(data), to: ETH.Utils
   defdelegate decode16(decoded_data), to: ETH.Utils
   defdelegate to_buffer(data), to: ETH.Utils
