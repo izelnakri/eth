@@ -221,10 +221,10 @@ defmodule ETH.Transaction do
   end
 
   defp set_default_from(params, private_key) when is_list(params) do
-    put_in(params, [:from], Keyword.get(params, :from, get_address(private_key)))
+    put_in(params, [:from], Keyword.get_lazy(params, :from, fn -> get_address(private_key) end))
   end
 
   defp set_default_from(params, private_key) when is_map(params) do
-    Map.merge(params, %{from: Map.get(params, :from, get_address(private_key))})
+    Map.merge(params, %{from: Map.get_lazy(params, :from, fn -> get_address(private_key) end)})
   end
 end

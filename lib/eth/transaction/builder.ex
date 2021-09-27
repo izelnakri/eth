@@ -65,7 +65,7 @@ defmodule ETH.Transaction.Builder do
   defp build_params_from_list(params) do
     to = Keyword.get(params, :to, "")
     value = Keyword.get(params, :value, 0)
-    gas_price = Keyword.get(params, :gas_price, ETH.gas_price!())
+    gas_price = Keyword.get_lazy(params, :gas_price, fn -> ETH.gas_price!() end)
     data = Keyword.get(params, :data, "")
 
     target_data =
@@ -73,20 +73,22 @@ defmodule ETH.Transaction.Builder do
         do: "0x" <> Hexate.encode(data),
         else: data
 
-    nonce = Keyword.get(params, :nonce, generate_nonce(Keyword.get(params, :from)))
+    nonce = Keyword.get_lazy(params, :nonce, fn -> generate_nonce(Keyword.get(params, :from)) end)
     chain_id = Keyword.get(params, :chain_id, 3)
 
     gas_limit =
-      Keyword.get(
+      Keyword.get_lazy(
         params,
         :gas_limit,
-        ETH.estimate_gas!(%{
-          to: to,
-          value: value,
-          data: target_data,
-          nonce: nonce,
-          chain_id: chain_id
-        })
+        fn ->
+          ETH.estimate_gas!(%{
+            to: to,
+            value: value,
+            data: target_data,
+            nonce: nonce,
+            chain_id: chain_id
+          })
+        end
       )
 
     %{
@@ -102,7 +104,7 @@ defmodule ETH.Transaction.Builder do
   defp build_params_from_map(params) do
     to = Map.get(params, :to, "")
     value = Map.get(params, :value, 0)
-    gas_price = Map.get(params, :gas_price, ETH.gas_price!())
+    gas_price = Map.get_lazy(params, :gas_price, fn -> ETH.gas_price!() end)
     data = Map.get(params, :data, "")
 
     target_data =
@@ -110,20 +112,22 @@ defmodule ETH.Transaction.Builder do
         do: "0x" <> Hexate.encode(data),
         else: data
 
-    nonce = Map.get(params, :nonce, generate_nonce(Map.get(params, :from)))
+    nonce = Map.get_lazy(params, :nonce, fn -> generate_nonce(Map.get(params, :from)) end)
     chain_id = Map.get(params, :chain_id, 3)
 
     gas_limit =
-      Map.get(
+      Map.get_lazy(
         params,
         :gas_limit,
-        ETH.estimate_gas!(%{
-          to: to,
-          value: value,
-          data: target_data,
-          nonce: nonce,
-          chain_id: chain_id
-        })
+        fn ->
+          ETH.estimate_gas!(%{
+            to: to,
+            value: value,
+            data: target_data,
+            nonce: nonce,
+            chain_id: chain_id
+          })
+        end
       )
 
     %{
