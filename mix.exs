@@ -34,7 +34,7 @@ defmodule Eth.Mixfile do
       {:hexate, "~> 0.6.1"},
       {:ex_keccak, "~> 0.2.0"},
       {:mnemonic, "~> 0.3.0"},
-      {:poison, "~> 5.0.0"},
+      {:poison, "~> 5.0.0", only: :test},
       {:ex_secp256k1, "~> 0.2.1"},
     ]
   end
