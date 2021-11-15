@@ -82,7 +82,7 @@ by adding `eth` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:eth, "~> 0.3.0"}
+    {:eth, "~> 0.6.5"}
   ]
 end
 ```
