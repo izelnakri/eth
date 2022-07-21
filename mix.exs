@@ -30,7 +30,7 @@ defmodule Eth.Mixfile do
       {:ethereumex, "~> 0.7.0"},
       {:ex_rlp, "~> 0.5.3"},
       {:ex_doc, ">= 0.25.2", only: :dev},
-      {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.2.0", only: [:dev], runtime: false},
       {:hexate, "~> 0.6.1"},
       {:ex_keccak, "~> 0.2.0"},
       {:mnemonic, "~> 0.3.0"},
