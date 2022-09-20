@@ -92,6 +92,7 @@ defmodule ETH.Transaction.Builder do
       )
 
     %{
+      chain_id: chain_id,
       nonce: nonce,
       gas_price: gas_price,
       gas_limit: gas_limit,
@@ -131,6 +132,7 @@ defmodule ETH.Transaction.Builder do
       )
 
     %{
+      chain_id: chain_id,
       nonce: nonce,
       gas_price: gas_price,
       gas_limit: gas_limit,
