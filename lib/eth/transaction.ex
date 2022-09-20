@@ -24,11 +24,12 @@ defmodule ETH.Transaction do
   end
 
   def send_transaction(params, private_key) do
-    set_default_from(params, private_key)
-    |> build
-    |> sign_transaction(private_key)
-    |> Base.encode16()
-    |> send
+    tx_to_sign = set_default_from(params, private_key)
+      |> build
+    tx_to_sign
+      |> sign_transaction(private_key)
+      |> Base.encode16()
+      |> send
   end
 
   def send_transaction(sender_wallet, receiver_wallet, value) when is_number(value) do

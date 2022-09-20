@@ -70,6 +70,7 @@ defmodule ETH.Transaction.Parser do
 
   def parse(
         _transaction = %{
+          chain_id: chain_id,
           nonce: nonce,
           gas_price: gas_price,
           gas_limit: gas_limit,
@@ -82,6 +83,7 @@ defmodule ETH.Transaction.Parser do
         }
       ) do
     %{
+      chain_id: to_buffer(chain_id),
       nonce: to_buffer(nonce),
       gas_price: to_buffer(gas_price),
       gas_limit: to_buffer(gas_limit),
@@ -96,6 +98,7 @@ defmodule ETH.Transaction.Parser do
 
   def parse(
         _transaction = %{
+          chain_id: chain_id,
           nonce: nonce,
           gas_price: gas_price,
           gas_limit: gas_limit,
@@ -105,6 +108,7 @@ defmodule ETH.Transaction.Parser do
         }
       ) do
     %{
+      chain_id: to_buffer(chain_id),
       nonce: to_buffer(nonce),
       gas_price: to_buffer(gas_price),
       gas_limit: to_buffer(gas_limit),
@@ -139,6 +143,7 @@ defmodule ETH.Transaction.Parser do
 
   def to_list(
         transaction = %{
+          chain_id: chain_id,
           nonce: nonce,
           gas_price: gas_price,
           gas_limit: gas_limit,
@@ -151,7 +156,7 @@ defmodule ETH.Transaction.Parser do
     r = Map.get(transaction, :r, "")
     s = Map.get(transaction, :s, "")
 
-    [nonce, gas_price, gas_limit, to, value, data, v, r, s]
+    [nonce, gas_price, gas_limit, to, value, data, v, r, s, chain_id]
     |> Enum.map(fn value -> to_buffer(value) end)
   end
 end
