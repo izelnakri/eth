@@ -20,10 +20,10 @@
     "test": "mix test --seed 0"
   },
   "devDependencies": {
-    "@j-ulrich/release-it-regex-bumper": "^2.0.0",
-    "auto-changelog": "^2.3.0",
+    "@j-ulrich/release-it-regex-bumper": "^4.1.1",
+    "auto-changelog": "^2.4.0",
     "ganache-cli": "6.12.2",
-    "release-it": "^14.11.5"
+    "release-it": "^15.5.1"
   },
   "release-it": {
     "plugins": {
