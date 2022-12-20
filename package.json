@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "eth",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "author": "Izel Nakri",
   "license": "MIT",
   "description": "[![Hex Version](http://img.shields.io/hexpm/v/eth.svg?style=flat)](https://hex.pm/packages/eth) [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/eth/ETH.html)",
