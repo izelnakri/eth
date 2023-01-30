@@ -34,7 +34,7 @@ defmodule ETH.Transaction.Signer do
 
     target_list
     |> ExRLP.encode()
-    |> ExKeccak.hash_256
+    |> ExKeccak.hash_256()
   end
 
   def hash_transaction(
@@ -102,6 +102,10 @@ defmodule ETH.Transaction.Signer do
     sign_transaction_list(transaction_list, decoded_private_key)
   end
 
+  defp trim_leading_zeroes(binary) do
+    String.trim_leading(binary, <<0>>)
+  end
+
   defp sign_transaction_list(
          transaction_list = [
            nonce,
@@ -130,8 +134,17 @@ defmodule ETH.Transaction.Signer do
 
     sig_v = if chain_id_int > 0, do: initial_v + (chain_id_int * 2 + 8), else: initial_v
 
-
-    [nonce, gas_price, gas_limit, to, value, data, <<sig_v>>, sig_r, sig_s]
+    [
+      nonce,
+      gas_price,
+      gas_limit,
+      to,
+      value,
+      data,
+      <<sig_v>>,
+      trim_leading_zeroes(sig_r),
+      trim_leading_zeroes(sig_s)
+    ]
     |> ExRLP.encode()
   end
 end
