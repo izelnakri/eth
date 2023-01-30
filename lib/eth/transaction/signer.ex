@@ -102,9 +102,7 @@ defmodule ETH.Transaction.Signer do
     sign_transaction_list(transaction_list, decoded_private_key)
   end
 
-  defp trim_leading_zeroes(binary) do
-    String.trim_leading(binary, <<0>>)
-  end
+  defp trim_leading_zeroes(binary), do: String.trim_leading(binary, <<0>>)
 
   defp sign_transaction_list(
          transaction_list = [
