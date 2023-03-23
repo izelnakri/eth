@@ -28,14 +28,14 @@ defmodule Eth.Mixfile do
   defp deps() do
     [
       {:ethereumex, "~> 0.7.0"},
-      {:ex_rlp, "~> 0.5.3"},
+      {:ex_rlp, "~> 0.6.0"},
       {:ex_doc, ">= 0.25.2", only: :dev},
       {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
       {:hexate, "~> 0.6.1"},
-      {:ex_keccak, "~> 0.2.0"},
+      {:ex_keccak, "~> 0.7.1"},
       {:mnemonic, "~> 0.3.0"},
       {:poison, "~> 5.0.0", only: :test},
-      {:ex_secp256k1, "~> 0.2.1"},
+      {:ex_secp256k1, "~> 0.7.0"}
     ]
   end
 
