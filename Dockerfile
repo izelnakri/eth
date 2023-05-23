@@ -10,7 +10,7 @@ RUN apt-get update && apt-get -y install cargo python procps autoconf libtool li
 
 ENV PATH=$PATH:/root/.volta/bin
 
-RUN volta install node@16.9
+RUN volta install node@18.16
 
 ADD ["package.json", "package-lock.json", "/code/"]
 

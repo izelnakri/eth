@@ -89,10 +89,10 @@ end
 
 ### Running the tests
 
-Install a testrpc(now renamed to ganache-cli) to run ethereum locally:
-```npm install -g ganache-cli```
+Install a testrpc(now renamed to ganache) to run ethereum locally:
+```npm install -g ganache```
 
-Elixir tests automatically spawns and kills the ganache-cli process. All you need to do now is to run the tests in sequence thus --seed 0:
+Elixir tests automatically spawns and kills the ganache process. All you need to do now is to run the tests in sequence thus --seed 0:
 ```mix test --seed 0```
 
 The docs can be found at [https://hexdocs.pm/eth](https://hexdocs.pm/eth).
