@@ -3,14 +3,15 @@ defmodule ETH.TestClient do
 
   def start do
     spawn(fn ->
-      "node_modules/.bin/ganache -b=0.35 -m=\" parent leopard beauty edit tilt what blast next huge need print advice evolve move explain govern grab raccoon gown gravity gloom walnut silver reopen\""
+      "node_modules/.bin/ganache -b=0.35 -e=100 -m=\" parent leopard beauty edit tilt what blast next huge need print advice evolve move explain govern grab raccoon gown gravity gloom walnut silver reopen\""
       |> String.to_charlist()
       |> :os.cmd()
 
       # this makes the process hang, maybe with elixir ports we can intercept?
     end)
 
-    wait_until_the_port_is_open() # NOTE: since couldnt find a way to intercept the testrpc init no way to know when test blockchain actually starts
+    # NOTE: since couldnt find a way to intercept the testrpc init no way to know when test blockchain actually starts
+    wait_until_the_port_is_open()
     advance_block_by(1)
   end
 

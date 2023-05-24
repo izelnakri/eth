@@ -76,6 +76,7 @@ defmodule ETH.Query.Test do
     assert current_block.number == ETH.block_number!()
 
     assert Map.keys(current_block) == [
+             :base_fee_per_gas,
              :difficulty,
              :extra_data,
              :gas_limit,
@@ -95,7 +96,9 @@ defmodule ETH.Query.Test do
              :total_difficulty,
              :transactions,
              :transactions_root,
-             :uncles
+             :uncles,
+             :withdrawals,
+             :withdrawals_root
            ]
   end
 
@@ -110,6 +113,7 @@ defmodule ETH.Query.Test do
     assert target_block.number != ETH.get_block!(1) |> Map.get(:number)
 
     assert Map.keys(target_block) == [
+             :base_fee_per_gas,
              :difficulty,
              :extra_data,
              :gas_limit,
@@ -129,7 +133,9 @@ defmodule ETH.Query.Test do
              :total_difficulty,
              :transactions,
              :transactions_root,
-             :uncles
+             :uncles,
+             :withdrawals,
+             :withdrawals_root
            ]
   end
 
@@ -147,6 +153,7 @@ defmodule ETH.Query.Test do
     assert current_block.number == ETH.block_number!()
 
     assert Map.keys(current_block) == [
+             :base_fee_per_gas,
              :difficulty,
              :extra_data,
              :gas_limit,
@@ -166,7 +173,9 @@ defmodule ETH.Query.Test do
              :total_difficulty,
              :transactions,
              :transactions_root,
-             :uncles
+             :uncles,
+             :withdrawals,
+             :withdrawals_root
            ]
   end
 
@@ -179,6 +188,7 @@ defmodule ETH.Query.Test do
     assert target_block.number != ETH.get_block!(1) |> Map.get(:number)
 
     assert Map.keys(target_block) == [
+             :base_fee_per_gas,
              :difficulty,
              :extra_data,
              :gas_limit,
@@ -198,12 +208,14 @@ defmodule ETH.Query.Test do
              :total_difficulty,
              :transactions,
              :transactions_root,
-             :uncles
+             :uncles,
+             :withdrawals,
+             :withdrawals_root
            ]
   end
 
   test "get_block!/1 by hash works" do
-    ETH.TestClient.advance_block_by(1)
+    ETH.TestClient.advance_block_by(2)
 
     first_block = ETH.get_block!(1)
     second_block = ETH.get_block!(2)
