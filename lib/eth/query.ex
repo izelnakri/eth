@@ -71,7 +71,7 @@ defmodule ETH.Query do
   end
 
   def get_block(block_hash) do
-    case HttpClient.eth_get_block_by_number(block_hash, true) do
+    case HttpClient.eth_get_block_by_hash(block_hash, true) do
       {:ok, raw_block_details} -> {:ok, convert_block_details(raw_block_details)}
       error -> error
     end
@@ -79,7 +79,6 @@ defmodule ETH.Query do
 
   def get_block! do
     block_hash = "0x" <> Hexate.encode(block_number!())
-
     {:ok, raw_block_details} = HttpClient.eth_get_block_by_number(block_hash, true)
 
     convert_block_details(raw_block_details)
@@ -94,7 +93,7 @@ defmodule ETH.Query do
   end
 
   def get_block!(block_hash) do
-    {:ok, raw_block_details} = HttpClient.eth_get_block_by_number(block_hash, true)
+    {:ok, raw_block_details} = HttpClient.eth_get_block_by_hash(block_hash, true)
 
     convert_block_details(raw_block_details)
   end
