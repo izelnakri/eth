@@ -64,6 +64,7 @@ defmodule ETH.Transaction.Builder do
 
   defp build_params_from_list(params) do
     to = Keyword.get(params, :to, "")
+    from = Keyword.get(params, :from, "")
     value = Keyword.get(params, :value, 0)
     gas_price = Keyword.get_lazy(params, :gas_price, fn -> ETH.gas_price!() end)
     data = Keyword.get(params, :data, "")
@@ -82,6 +83,7 @@ defmodule ETH.Transaction.Builder do
         :gas_limit,
         fn ->
           ETH.estimate_gas!(%{
+            from: from,
             to: to,
             value: value,
             data: target_data,
@@ -103,6 +105,7 @@ defmodule ETH.Transaction.Builder do
   end
 
   defp build_params_from_map(params) do
+    from = Map.get(params, :from, "")
     to = Map.get(params, :to, "")
     value = Map.get(params, :value, 0)
     gas_price = Map.get_lazy(params, :gas_price, fn -> ETH.gas_price!() end)
@@ -122,10 +125,11 @@ defmodule ETH.Transaction.Builder do
         :gas_limit,
         fn ->
           ETH.estimate_gas!(%{
+            from: from,
             to: to,
-            value: value,
+            value:  ETH.Utils.prepend0x(Hexate.encode(value)),
             data: target_data,
-            nonce: nonce,
+            nonce:  ETH.Utils.prepend0x(Hexate.encode(nonce)),
             chain_id: chain_id
           })
         end

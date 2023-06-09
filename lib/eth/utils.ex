@@ -106,6 +106,14 @@ defmodule ETH.Utils do
     if computed_chain_id == 0, do: chain_id || 0, else: computed_chain_id
   end
 
+  @doc """
+  Prepend a 0x to a string value
+  """
+  @spec prepend0x(nil | binary) :: nil | <<_::16, _::_*8>>
+  def prepend0x(nil), do: nil
+  def prepend0x("0x" <> _ = val), do: val
+  def prepend0x(val), do: "0x" <> val
+
   defp compute_chain_id("0x" <> v) do
     sig_v = buffer_to_int(v)
     chain_id = Float.floor((sig_v - 35) / 2)

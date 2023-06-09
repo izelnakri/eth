@@ -147,10 +147,10 @@ defmodule ETH.Transaction do
     tx_hash
   end
 
-  def send(signature), do: HttpClient.eth_send_raw_transaction(signature)
+  def send(signature), do: HttpClient.eth_send_raw_transaction(prepend0x(signature))
 
   def send!(signature) do
-    {:ok, transaction_hash} = HttpClient.eth_send_raw_transaction(signature)
+    {:ok, transaction_hash} = HttpClient.eth_send_raw_transaction(prepend0x(signature))
     transaction_hash
   end
 
