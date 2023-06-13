@@ -155,17 +155,21 @@ defmodule ETH.Query do
       {:ok, hex_gas_estimate} ->
         {:ok, hex_gas_estimate |> convert_to_number |> convert(denomination) |> round}
 
-      error ->
-        error
+      {:error, error} ->
+        {:error, error}
     end
   end
 
   def estimate_gas!(transaction \\ %{data: ""}, denomaination \\ :wei)
 
   def estimate_gas!(transaction = %{to: _to, data: _data}, denomination) do
-    {:ok, hex_gas_estimate} = HttpClient.eth_estimate_gas(transaction)
+    case HttpClient.eth_estimate_gas(transaction) do
+      {:ok, hex_gas_estimate} ->
+        hex_gas_estimate |> convert_to_number |> convert(denomination) |> round
 
-    hex_gas_estimate |> convert_to_number |> convert(denomination) |> round
+      {:error, error} ->
+        {:error, error}
+    end
   end
 
   def convert_transaction_log(log) do
