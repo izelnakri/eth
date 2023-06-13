@@ -26,9 +26,12 @@ defmodule ETH.Transaction do
   def send_transaction(params, private_key) do
     set_default_from(params, private_key)
     |> build
-    |> sign_transaction(private_key)
-    |> Base.encode16()
-    |> send
+    |> case do
+      %{gas_limit: {:error, error}} -> {:error, error}
+      build -> sign_transaction(build, private_key)
+      |> Base.encode16()
+      |> send
+    end
   end
 
   def send_transaction(sender_wallet, receiver_wallet, value) when is_number(value) do
