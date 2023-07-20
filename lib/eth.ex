@@ -32,11 +32,13 @@ defmodule ETH do
   defdelegate get_block!, to: ETH.Query
   defdelegate get_block!(identifier), to: ETH.Query
   defdelegate get_balance(wallet_or_address), to: ETH.Query
-  defdelegate get_balance(wallet_or_address, state), to: ETH.Query
+  defdelegate get_balance(wallet_or_address, denomination), to: ETH.Query
   defdelegate get_balance(wallet_or_address, denomination, state), to: ETH.Query
+  defdelegate get_balance(wallet_or_address, denomination, state, opts), to: ETH.Query
   defdelegate get_balance!(wallet_or_address), to: ETH.Query
-  defdelegate get_balance!(wallet_or_address, state), to: ETH.Query
+  defdelegate get_balance!(wallet_or_address, denomination), to: ETH.Query
   defdelegate get_balance!(wallet_or_address, denomination, state), to: ETH.Query
+  defdelegate get_balance!(wallet_or_address, denomination, state, opts), to: ETH.Query
   defdelegate estimate_gas(transaction), to: ETH.Query
   defdelegate estimate_gas!(transaction), to: ETH.Query
   defdelegate estimate_gas(transaction, denomination), to: ETH.Query

@@ -98,10 +98,10 @@ defmodule ETH.Query do
     convert_block_details(raw_block_details)
   end
 
-  def get_balance(param, denomination \\ :ether, state \\ "latest")
+  def get_balance(param, denomination \\ :ether, state \\ "latest", opts \\ [])
 
-  def get_balance(wallet, denomination, state) when is_map(wallet) do
-    case HttpClient.eth_get_balance(wallet.eth_address, state) do
+  def get_balance(wallet, denomination, state, opts) when is_map(wallet) do
+    case HttpClient.eth_get_balance(wallet.eth_address, state, opts) do
       {:ok, hex_balance} ->
         balance =
           hex_balance
@@ -115,8 +115,8 @@ defmodule ETH.Query do
     end
   end
 
-  def get_balance(eth_address, denomination, state) do
-    case HttpClient.eth_get_balance(eth_address, state) do
+  def get_balance(eth_address, denomination, state, opts) do
+    case HttpClient.eth_get_balance(eth_address, state, opts) do
       {:ok, hex_balance} ->
         balance =
           hex_balance
@@ -130,18 +130,18 @@ defmodule ETH.Query do
     end
   end
 
-  def get_balance!(param, denomination \\ :ether, state \\ "latest")
+  def get_balance!(param, denomination \\ :ether, state \\ "latest", opts \\ [])
 
-  def get_balance!(wallet, denomination, state) when is_map(wallet) do
-    {:ok, hex_balance} = HttpClient.eth_get_balance(wallet.eth_address, state)
+  def get_balance!(wallet, denomination, state, opts) when is_map(wallet) do
+    {:ok, hex_balance} = HttpClient.eth_get_balance(wallet.eth_address, state, opts)
 
     hex_balance
     |> convert_to_number
     |> convert(denomination)
   end
 
-  def get_balance!(eth_address, denomination, state) do
-    {:ok, hex_balance} = HttpClient.eth_get_balance(eth_address, state)
+  def get_balance!(eth_address, denomination, state, opts) do
+    {:ok, hex_balance} = HttpClient.eth_get_balance(eth_address, state, opts)
 
     hex_balance
     |> convert_to_number
