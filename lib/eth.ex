@@ -50,8 +50,8 @@ defmodule ETH do
   defdelegate get_block_transaction_count!(identifier), to: ETH.TransactionQueries
   defdelegate get_transaction_from_block(identifier, index), to: ETH.TransactionQueries
   defdelegate get_transaction_from_block!(identifier, index), to: ETH.TransactionQueries
-  defdelegate get_transaction(transaction_hash), to: ETH.TransactionQueries
-  defdelegate get_transaction!(transaction_hash), to: ETH.TransactionQueries
+  defdelegate get_transaction(transaction_hash, opts), to: ETH.TransactionQueries
+  defdelegate get_transaction!(transaction_hash, opts), to: ETH.TransactionQueries
   defdelegate get_transaction_receipt(transaction_hash), to: ETH.TransactionQueries
   defdelegate get_transaction_receipt!(transaction_hash), to: ETH.TransactionQueries
   defdelegate get_transaction_count(wallet_or_address), to: ETH.TransactionQueries
@@ -73,7 +73,7 @@ defmodule ETH do
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
   defdelegate encode(signed_transaction_list), to: ETH.Transaction.Signer
 
-  defdelegate send_transaction(params_or_wallet, private_key_or_params), to: ETH.Transaction
+  defdelegate send_transaction(params_or_wallet, private_key_or_params, opts), to: ETH.Transaction
 
   defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params),
     to: ETH.Transaction
@@ -81,7 +81,8 @@ defmodule ETH do
   defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params, private_key),
     to: ETH.Transaction
 
-  defdelegate send_transaction!(params_or_wallet, private_key_or_params), to: ETH.Transaction
+  defdelegate send_transaction!(params_or_wallet, private_key_or_params, opts),
+    to: ETH.Transaction
 
   defdelegate send_transaction!(sender_wallet, receiver_wallet, value_or_params),
     to: ETH.Transaction

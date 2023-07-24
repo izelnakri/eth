@@ -23,12 +23,12 @@ defmodule ETH.Transaction do
     |> send_transaction(wallet.private_key)
   end
 
-  def send_transaction(params, private_key) do
+  def send_transaction(params, private_key, opts) do
     set_default_from(params, private_key)
     |> build
     |> sign_transaction(private_key)
     |> Base.encode16()
-    |> send
+    |> send(opts)
   end
 
   def send_transaction(sender_wallet, receiver_wallet, value) when is_number(value) do
@@ -147,10 +147,10 @@ defmodule ETH.Transaction do
     tx_hash
   end
 
-  def send(signature), do: HttpClient.eth_send_raw_transaction(prepend0x(signature))
+  def send(signature, opts), do: HttpClient.eth_send_raw_transaction(prepend0x(signature), opts)
 
-  def send!(signature) do
-    {:ok, transaction_hash} = HttpClient.eth_send_raw_transaction(prepend0x(signature))
+  def send!(signature, opts) do
+    {:ok, transaction_hash} = HttpClient.eth_send_raw_transaction(prepend0x(signature), opts)
     transaction_hash
   end
 
