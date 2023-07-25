@@ -70,14 +70,14 @@ defmodule ETH.TransactionQueries do
     convert_transaction_details(transaction)
   end
 
-  def get_transaction(transaction_hash, opts) do
+  def get_transaction(transaction_hash, opts \\ []) do
     case HttpClient.eth_get_transaction_by_hash(transaction_hash, opts) do
       {:ok, raw_transaction} -> {:ok, convert_transaction_details(raw_transaction)}
       error -> error
     end
   end
 
-  def get_transaction!(transaction_hash, opts) do
+  def get_transaction!(transaction_hash, opts \\ []) do
     {:ok, raw_transaction} = HttpClient.eth_get_transaction_by_hash(transaction_hash, opts)
 
     convert_transaction_details(raw_transaction)

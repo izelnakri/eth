@@ -13,7 +13,11 @@ defmodule ETH do
       46080211
 
   """
-  Application.put_env(:ethereumex, :url, Application.get_env(:eth, :url, "http://localhost:8545"))
+  Application.put_env(
+    :ethereumex,
+    :url,
+    Application.compile_env(:eth, :url, "http://localhost:8545")
+  )
 
   defdelegate block_number, to: ETH.Query
   defdelegate block_number!, to: ETH.Query
@@ -91,7 +95,9 @@ defmodule ETH do
     to: ETH.Transaction
 
   defdelegate send(signature), to: ETH.Transaction
+  defdelegate send(signature, opts), to: ETH.Transaction
   defdelegate send!(signature), to: ETH.Transaction
+  defdelegate send!(signature, opts), to: ETH.Transaction
   defdelegate get_senders_public_key(transaction_input), to: ETH.Transaction
   defdelegate get_sender_address(transaction_input), to: ETH.Transaction
 

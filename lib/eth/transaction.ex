@@ -28,7 +28,8 @@ defmodule ETH.Transaction do
     |> build
     |> sign_transaction(private_key)
     |> Base.encode16()
-    |> send(opts)
+    # NOTE: use module to solve conflict of kerner.send/2
+    |> ETH.Transaction.send(opts)
   end
 
   def send_transaction(sender_wallet, receiver_wallet, value) when is_number(value) do
@@ -147,9 +148,10 @@ defmodule ETH.Transaction do
     tx_hash
   end
 
-  def send(signature, opts), do: HttpClient.eth_send_raw_transaction(prepend0x(signature), opts)
+  def send(signature, opts \\ []),
+    do: HttpClient.eth_send_raw_transaction(prepend0x(signature), opts)
 
-  def send!(signature, opts) do
+  def send!(signature, opts \\ []) do
     {:ok, transaction_hash} = HttpClient.eth_send_raw_transaction(prepend0x(signature), opts)
     transaction_hash
   end
