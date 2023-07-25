@@ -1,0 +1,79 @@
+name: Eth Library Build, Code Check and Test Pipeline
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+# NOTE: Required for GitHub workflow to get JWT to authenticate with AWS
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-analyze-test:
+    name: Build, code check and test
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      # Checkout the Code -----------------------------------------------------
+      - uses: actions/checkout@v2
+
+      # Setup Needed tools ----------------------------------------------------
+      - name: Setup elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: 1.14.5
+          otp-version: 25.3
+
+      # Restores cache ----------------------------------------------------
+      - name: Cache PLT files
+        id: cache-plt
+        uses: actions/cache@v3
+        with:
+          path: |
+            deps
+            _build
+          key: cache-v1-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            cache-v1-
+
+      # Get and build all the deps --------------------------------------------
+      - name: Install Dependencies
+        run: |
+          MIX_ENV=test mix deps.get
+
+      # Build the project -----------------------------------------------------
+      - name: Build the Project
+        run: MIX_ENV=test mix compile
+
+      # Check code format -----------------------------------------------------
+      - name: Run formatter check
+        run: |
+          mix format --check-formatted
+
+      # Run the unit tests ----------------------------------------------------
+      # - name: Run unit tests
+      #   run: |
+      #     mix test
+
+      # Run a static code analysis --------------------------------------------
+      # - name: Run Dialyzer
+      #   run: >
+      #     mix dialyzer --format dialyxir
+
+      # Build the docs --------------------------------------------------------
+      - name: Build docs
+        run: |
+          mix docs --formatter html --output eth_docs/
+
+      # Upload the docs as an artifact ----------------------------------------
+      - name: Upload docs
+        uses: actions/upload-artifact@v2
+        with:
+          name: eth_docs
+          if-no-files-found: error
+          path: |
+            eth_docs/
