@@ -25,8 +25,8 @@ jobs:
       - name: Setup elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: 1.13.3
-          otp-version: 24.3
+          elixir-version: 1.14.5
+          otp-version: 25.3
 
       # Restores cache ----------------------------------------------------
       - name: Cache PLT files
