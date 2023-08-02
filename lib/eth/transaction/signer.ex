@@ -115,14 +115,12 @@ defmodule ETH.Transaction.Signer do
            v,
            _r,
            _s,
-           _chain_id
+           chain_id
          ],
          <<private_key::binary-size(32)>>
        ) do
-    chain_id = get_chain_id(v, Enum.at(transaction_list, 9))
 
-    <<chain_id_int>> = chain_id
-
+    chain_id = get_chain_id(v, chain_id) |> buffer_to_int()
     message_hash = hash_transaction(transaction_list, false)
 
     [signature: signature, recovery: recovery] = secp256k1_signature(message_hash, private_key)
@@ -130,7 +128,7 @@ defmodule ETH.Transaction.Signer do
     <<sig_r::binary-size(32)>> <> <<sig_s::binary-size(32)>> = signature
     initial_v = recovery + 27
 
-    sig_v = if chain_id_int > 0, do: initial_v + (chain_id_int * 2 + 8), else: initial_v
+    sig_v = if chain_id > 0, do: initial_v + (chain_id * 2 + 8), else: initial_v
 
     [
       nonce,
@@ -139,7 +137,7 @@ defmodule ETH.Transaction.Signer do
       to,
       value,
       data,
-      <<sig_v>>,
+      sig_v,
       trim_leading_zeroes(sig_r),
       trim_leading_zeroes(sig_s)
     ]

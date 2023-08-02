@@ -31,15 +31,15 @@ defmodule ETH.Query do
     accounts
   end
 
-  def gas_price do
-    case HttpClient.eth_gas_price() do
+  def gas_price(opts \\ []) do
+    case HttpClient.eth_gas_price(opts) do
       {:ok, hex_gas_price} -> {:ok, convert_to_number(hex_gas_price)}
       error -> error
     end
   end
 
-  def gas_price! do
-    {:ok, hex_gas_price} = HttpClient.eth_gas_price()
+  def gas_price!(opts \\ []) do
+    {:ok, hex_gas_price} = HttpClient.eth_gas_price(opts)
 
     convert_to_number(hex_gas_price)
   end
@@ -164,6 +164,12 @@ defmodule ETH.Query do
 
   def estimate_gas!(transaction = %{to: _to, data: _data}, denomination) do
     {:ok, hex_gas_estimate} = HttpClient.eth_estimate_gas(transaction)
+
+    hex_gas_estimate |> convert_to_number |> convert(denomination) |> round
+  end
+
+  def estimate_gas!(transaction, denomination, opts) do
+    {:ok, hex_gas_estimate} = HttpClient.eth_estimate_gas(transaction, opts)
 
     hex_gas_estimate |> convert_to_number |> convert(denomination) |> round
   end

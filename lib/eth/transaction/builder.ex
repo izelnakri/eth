@@ -108,7 +108,14 @@ defmodule ETH.Transaction.Builder do
     from = Map.get(params, :from, "")
     to = Map.get(params, :to, "")
     value = Map.get(params, :value, 0)
-    gas_price = Map.get_lazy(params, :gas_price, fn -> ETH.gas_price!() end)
+
+    gas_price =
+      case is_map_key(params, :url) do
+        true ->
+          Map.get_lazy(params, :gas_price, fn -> ETH.gas_price!(url: Map.get(params, :url)) end)
+        false -> Map.get_lazy(params, :gas_price, fn -> ETH.gas_price!() end)
+      end
+
     data = Map.get(params, :data, "")
 
     target_data =
@@ -116,7 +123,7 @@ defmodule ETH.Transaction.Builder do
         do: "0x" <> Hexate.encode(data),
         else: data
 
-    nonce = Map.get_lazy(params, :nonce, fn -> generate_nonce(Map.get(params, :from)) end)
+    nonce = Map.get_lazy(params, :nonce, fn -> generate_nonce(Map.get(params, :from), url: Map.get(params, :url)) end)
     chain_id = Map.get(params, :chain_id, 3)
 
     gas_limit =
@@ -131,7 +138,7 @@ defmodule ETH.Transaction.Builder do
             data: target_data,
             nonce: ETH.Utils.prepend0x(Hexate.encode(nonce)),
             chain_id: chain_id
-          })
+          }, :wei, url: Map.get(params, :url))
         end
       )
 
@@ -147,5 +154,5 @@ defmodule ETH.Transaction.Builder do
   end
 
   defp generate_nonce(nil), do: 0
-  defp generate_nonce(address), do: ETH.get_transaction_count!(address, "pending")
+  defp generate_nonce(address, opts), do: ETH.get_transaction_count!(address, "pending", opts)
 end
