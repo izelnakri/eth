@@ -81,7 +81,8 @@ defmodule ETH do
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
   defdelegate encode(signed_transaction_list), to: ETH.Transaction.Signer
 
-  defdelegate send_transaction_with_opts(params_or_wallet, private_key_or_params, opts), to: ETH.Transaction
+  defdelegate send_transaction_with_opts(params_or_wallet, private_key_or_params, opts),
+    to: ETH.Transaction
 
   defdelegate send_transaction(params_or_wallet, private_key_or_params), to: ETH.Transaction
 

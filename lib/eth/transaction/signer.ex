@@ -119,7 +119,6 @@ defmodule ETH.Transaction.Signer do
          ],
          <<private_key::binary-size(32)>>
        ) do
-
     chain_id = get_chain_id(v, chain_id) |> buffer_to_int()
     message_hash = hash_transaction(transaction_list, false)
 
