@@ -23,7 +23,7 @@ defmodule ETH.Transaction do
     |> send_transaction(wallet.private_key)
   end
 
-  def send_transaction(params, private_key, opts) do
+  def send_transaction_with_opts(params, private_key, opts) do
     params
     |> Map.merge(%{url: Keyword.get(opts, :url)})
     |> set_default_from(private_key)
