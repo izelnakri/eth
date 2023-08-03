@@ -25,8 +25,8 @@ defmodule ETH do
   defdelegate syncing!, to: ETH.Query
   defdelegate get_accounts, to: ETH.Query
   defdelegate get_accounts!, to: ETH.Query
-  defdelegate gas_price(), to: ETH.Query
-  defdelegate gas_price!(), to: ETH.Query
+  defdelegate gas_price, to: ETH.Query
+  defdelegate gas_price!, to: ETH.Query
   defdelegate gas_price(opts), to: ETH.Query
   defdelegate gas_price!(opts), to: ETH.Query
   defdelegate call(call_params), to: ETH.Query
