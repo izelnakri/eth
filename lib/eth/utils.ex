@@ -93,8 +93,7 @@ defmodule ETH.Utils do
 
   # defp buffer_to_int(""), do: 0
   def buffer_to_int(data) do
-    <<number>> = to_buffer(data)
-    number
+    data |> to_buffer() |> :binary.decode_unsigned()
   end
 
   def pad_to_even(data) do

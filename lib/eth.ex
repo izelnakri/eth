@@ -27,6 +27,8 @@ defmodule ETH do
   defdelegate get_accounts!, to: ETH.Query
   defdelegate gas_price, to: ETH.Query
   defdelegate gas_price!, to: ETH.Query
+  defdelegate gas_price(opts), to: ETH.Query
+  defdelegate gas_price!(opts), to: ETH.Query
   defdelegate call(call_params), to: ETH.Query
   defdelegate call(call_params, state), to: ETH.Query
   defdelegate call!(call_params), to: ETH.Query
@@ -47,6 +49,7 @@ defmodule ETH do
   defdelegate estimate_gas!(transaction), to: ETH.Query
   defdelegate estimate_gas(transaction, denomination), to: ETH.Query
   defdelegate estimate_gas!(transaction, denomination), to: ETH.Query
+  defdelegate estimate_gas!(transaction, denomination, opts), to: ETH.Query
 
   defdelegate get_block_transactions(identifier), to: ETH.TransactionQueries
   defdelegate get_block_transactions!(identifier), to: ETH.TransactionQueries
@@ -62,6 +65,7 @@ defmodule ETH do
   defdelegate get_transaction_count(wallet_or_address, state), to: ETH.TransactionQueries
   defdelegate get_transaction_count!(wallet_or_address), to: ETH.TransactionQueries
   defdelegate get_transaction_count!(wallet_or_address, state), to: ETH.TransactionQueries
+  defdelegate get_transaction_count!(wallet_or_address, state, opts), to: ETH.TransactionQueries
 
   defdelegate parse(data), to: ETH.Transaction.Parser
   defdelegate to_list(data), to: ETH.Transaction.Parser
@@ -77,7 +81,10 @@ defmodule ETH do
   defdelegate decode(rlp_encoded_transaction), to: ETH.Transaction.Signer
   defdelegate encode(signed_transaction_list), to: ETH.Transaction.Signer
 
-  defdelegate send_transaction(params_or_wallet, private_key_or_params, opts), to: ETH.Transaction
+  defdelegate send_transaction_with_opts(params_or_wallet, private_key_or_params, opts),
+    to: ETH.Transaction
+
+  defdelegate send_transaction(params_or_wallet, private_key_or_params), to: ETH.Transaction
 
   defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params),
     to: ETH.Transaction
@@ -85,7 +92,7 @@ defmodule ETH do
   defdelegate send_transaction(sender_wallet, receiver_wallet, value_or_params, private_key),
     to: ETH.Transaction
 
-  defdelegate send_transaction!(params_or_wallet, private_key_or_params, opts),
+  defdelegate send_transaction!(params_or_wallet, private_key_or_params),
     to: ETH.Transaction
 
   defdelegate send_transaction!(sender_wallet, receiver_wallet, value_or_params),

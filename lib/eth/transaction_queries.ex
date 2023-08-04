@@ -131,6 +131,12 @@ defmodule ETH.TransactionQueries do
     convert_to_number(hex_transaction_count)
   end
 
+  def get_transaction_count!(eth_address, state, opts) do
+    {:ok, hex_transaction_count} = HttpClient.eth_get_transaction_count(eth_address, state, opts)
+
+    convert_to_number(hex_transaction_count)
+  end
+
   def convert_to_number(result) do
     result
     |> String.slice(2..-1)
