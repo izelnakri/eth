@@ -87,7 +87,7 @@ def deps do
 end
 ```
 
-### Running the tests
+### Running the tests (deprecated)
 
 Install a testrpc(now renamed to ganache) to run ethereum locally:
 ```npm install -g ganache```

@@ -5,16 +5,9 @@ ENV MIX_ENV=$MIX_ENV
 
 WORKDIR /code
 
-RUN apt-get update && apt-get -y install cargo python procps autoconf libtool libgmp3-dev git curl make build-essential && \
-  curl https://get.volta.sh | bash
-
-ENV PATH=$PATH:/root/.volta/bin
-
-RUN volta install node@18.16
+RUN apt-get update && apt-get -y install cargo python procps autoconf libtool libgmp3-dev git curl make build-essential
 
 ADD ["package.json", "package-lock.json", "/code/"]
-
-RUN npm install
 
 ADD ["mix.lock", "mix.exs", "/code/"]
 
